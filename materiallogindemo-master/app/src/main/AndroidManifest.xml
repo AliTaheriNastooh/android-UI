@@ -22,8 +22,13 @@
         <activity
             android:name=".SignupActivity"
             android:theme="@style/AppTheme.Dark" />
-        <activity android:name=".chooseDevice"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".chooseDevice"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SetDeviceDetails"
+            android:theme="@style/AppTheme.Dark">
+
+        </activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.sourcey.materiallogindemo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
@@ -17,22 +18,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 public class chooseDevice extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     User user;
     boolean flag_icon=false;
     private Menu menu;
+    ListView listView;
+    int counter=1;
+    int request_code=1;
+    CustomListAdapter whatever;
+    ArrayList<String> nameArray=new ArrayList<String>();
+    ArrayList<String> addressArray=new ArrayList<String>();
+    ArrayList<Integer> imageArray=new ArrayList<Integer>();
+    ArrayList<Device> devices=new ArrayList<Device>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_device);
         user=(User)getIntent().getSerializableExtra(LoginActivity.TAG);
-
-
+        whatever = new CustomListAdapter(this, nameArray, addressArray, imageArray);
+        listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(whatever);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -40,8 +53,9 @@ public class chooseDevice extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(getApplicationContext(), SetDeviceDetails.class);
+                startActivityForResult(i, request_code);
+
             }
         });
 
@@ -77,8 +91,36 @@ public class chooseDevice extends AppCompatActivity
                     }
                 }
         );
+
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == request_code) {
+            if (resultCode == RESULT_OK) {
+                String deviceName = data.getStringExtra("deviceName");
+                String deviceModel = data.getStringExtra("deviceModel");
+                String deviceAdress = data.getStringExtra("deviceAddress");
+                String devicePhoneNumber = data.getStringExtra("devicePhoneNumber");
+                Integer deviceImage=R.drawable.face;
+                if(deviceModel.equals("agriculture")){
+                    deviceImage=R.drawable.agriculture;
+                }else if(deviceModel.equals("building")){
+                    deviceImage=R.drawable.building;
+                }else if(deviceModel.equals("parking")){
+                    deviceImage=R.drawable.parking;
+                }
+                devices.add(new Device(deviceName,deviceModel,deviceAdress,devicePhoneNumber,deviceImage));
+                setContentOfListView(deviceName,deviceAdress,deviceImage);
+            }
+        }
+    }
+    public void setContentOfListView(String deviceName,String deviceAddress,Integer deviceImage){
+        nameArray.add(deviceName);
+        addressArray.add(deviceAddress);
+        imageArray.add(deviceImage);
+        whatever.notifyDataSetChanged();
+
+    }
     public void changeDataOfNavigationDrawble(){
         TextView tUserName=(TextView)findViewById(R.id.textViewName);
         TextView tEmail=(TextView)findViewById(R.id.textViewEmail);
