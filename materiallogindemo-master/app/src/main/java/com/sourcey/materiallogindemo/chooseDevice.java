@@ -1,11 +1,15 @@
 package com.sourcey.materiallogindemo;
 
+import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -20,9 +24,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class chooseDevice extends AppCompatActivity
@@ -37,11 +43,23 @@ public class chooseDevice extends AppCompatActivity
     ArrayList<String> nameArray=new ArrayList<String>();
     ArrayList<String> addressArray=new ArrayList<String>();
     ArrayList<Integer> imageArray=new ArrayList<Integer>();
-    ArrayList<Device> devices=new ArrayList<Device>();
+    MyArrayList<Device> devices=new MyArrayList<Device>();
+    public File cacheDir;
+    Device tmp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_device);
+
+
+
+        if(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
+            cacheDir=new File(android.os.Environment.getExternalStorageDirectory(),"MyCustomObject");
+        else
+            cacheDir= getCacheDir();
+        if(!cacheDir.exists())
+            cacheDir.mkdirs();
+
         user=(User)getIntent().getSerializableExtra(LoginActivity.TAG);
         whatever = new CustomListAdapter(this, nameArray, addressArray, imageArray);
         listView = (ListView) findViewById(R.id.listView);
@@ -51,10 +69,15 @@ public class chooseDevice extends AppCompatActivity
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), SetDeviceDetails.class);
-                startActivityForResult(i, request_code);
+                ActivityOptions options =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
+              //  startActivity(i, options.toBundle());
+                startActivityForResult(i, request_code,options.toBundle());
 
             }
         });
@@ -91,6 +114,7 @@ public class chooseDevice extends AppCompatActivity
                     }
                 }
         );
+        loadPreferences();
 
     }
 
@@ -109,7 +133,8 @@ public class chooseDevice extends AppCompatActivity
                 }else if(deviceModel.equals("parking")){
                     deviceImage=R.drawable.parking;
                 }
-                devices.add(new Device(deviceName,deviceModel,deviceAdress,devicePhoneNumber,deviceImage));
+                tmp=new Device(deviceName,deviceModel,deviceAdress,devicePhoneNumber,deviceImage);
+                devices.add(tmp);
                 setContentOfListView(deviceName,deviceAdress,deviceImage);
             }
         }
@@ -178,13 +203,14 @@ public class chooseDevice extends AppCompatActivity
     }
     @Override
     public void onPause() {
-        super.onPause();
         savePreferences();
+        super.onPause();
 
     }
     @Override
     public void onResume(){
         super.onResume();
+
     }
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -218,6 +244,20 @@ public class chooseDevice extends AppCompatActivity
         mdrawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    public void loadPreferences(){
+
+        devices = devices.getObject(getApplicationContext(),cacheDir);
+
+        if(devices!= null) {
+            //Toast.makeText(this, "Retrieved object", Toast.LENGTH_LONG).show();
+            for(int i=0;i<devices.size();i++){
+                setContentOfListView(devices.get(i).getName(),devices.get(i).getAddress(),devices.get(i).getImage());
+            }
+        }else {
+            //Toast.makeText(this, "Error retrieving object", Toast.LENGTH_LONG).show();
+
+        }
+    }
     private void savePreferences() {
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME,
                 Context.MODE_PRIVATE);
@@ -234,11 +274,13 @@ public class chooseDevice extends AppCompatActivity
         System.out.println("onPause save mobile" + mobileValue);
         System.out.println("onPause save email: " + emailValue);
         System.out.println("onPause save rememberMe: " + rememberValue);
+
         editor.putString(MainActivity.PREF_UNAME, unameValue);
         editor.putString(MainActivity.PREF_PASSWORD, passwordValue);
         editor.putString(MainActivity.PREF_EMAIL, emailValue);
         editor.putString(MainActivity.PREFS_MOBILE, mobileValue);
         editor.putString(MainActivity.PREF_REMEMBER, rememberValue);
         editor.commit();
+        boolean result =devices.saveObject(devices,cacheDir);
     }
 }

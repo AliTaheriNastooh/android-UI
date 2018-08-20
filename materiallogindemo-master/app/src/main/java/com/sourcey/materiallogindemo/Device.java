@@ -1,6 +1,8 @@
 package com.sourcey.materiallogindemo;
 
-public class Device {
+import java.io.Serializable;
+
+public class Device implements Serializable {
     private String name;
     private String model;
     private String address;
