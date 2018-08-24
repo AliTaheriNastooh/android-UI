@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/configOfDevice"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tag="configDevice"
+    tools:context=".ConfigOfDevice">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/radioGroupOfConfigDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButtonOfNumbersList"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="فهرست شماره ها" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfAddNumber"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="افزودن شماره" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfsetDate"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="تنظیم تاریخ" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfsetTime"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="تنظیم ساعت" />
+
+        </RadioGroup>
+
+
+        <LinearLayout
+            android:id="@+id/linearLayoutOfsetDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="30dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:onClick="setDate"
+                    android:text="تنظیم خودکار"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="تاریخ را وارد کنید: "
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editTextOfsetDay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="روز"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/editTextOfSetMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="ماه"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/editTextOfSetYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="سال(دورقم)"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutOfsetTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="30dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:onClick="setTime"
+                    android:text="تنظیم خودکار"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="زمان را وارد کنید:"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editTextOfSetHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="ساعت"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/editTextOfSetMinute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="سال(دورقم)"
+                    android:inputType="numberDecimal"
+                    android:text="دقیقه" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutOfAddNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="شماره تماس مورد نظر را وارد کنید:"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/addNumberToConfigList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="مثال:09160000000"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutOfHintToShowList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="دکمه اعمال تغییرات را بزنید سپس بعد از ارتباط با دستگاه لیست نمایش داده میشود"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</FrameLayout>

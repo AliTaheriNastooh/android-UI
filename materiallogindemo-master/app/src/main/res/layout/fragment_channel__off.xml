@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tag="Channeloff"
+    tools:context=".Channel_Off">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textOfChannelOff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="کانال خاموش است"
+            android:textColor="@android:color/holo_red_dark" />
+
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/radioGroupOfChannelOff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButtonOfOpenImmediate"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="بازشدن فوری" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfOpenWithDelay"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="بازشدن با تاخیر" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfPeriodicProgram"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="برنامه دوره ایی" />
+
+            <RadioButton
+                android:id="@+id/radioButtonOfDeleteOrder"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableBottom="@android:drawable/btn_radio"
+                android:gravity="center"
+                android:text="حذف دستورها" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/layoutOfChannelTimeOn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextOfOpenTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="2"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:id="@+id/textViewOftimeChannelOpen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="مدت زمان باز بودن کانال به دقیقه را وارد کنید" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOfChannelStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextOfStartToOpenInMinute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="5"
+                android:hint="دقیقه"
+                android:inputType="time" />
+
+            <EditText
+                android:id="@+id/editTextOfstartOpenInHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="5"
+                android:hint="ساعت"
+                android:inputType="time" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="زمان باز شدن کانال را وارد کنید" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOfChannelPeriod"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextOfPeriodicTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="برحسب روز"
+                android:inputType="time" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="دوره تکرار باز بودن کانال را وارد کنید" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
