@@ -1,7 +1,12 @@
 package com.sourcey.materiallogindemo;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +16,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,7 +42,8 @@ public class Agriculture_system extends AppCompatActivity {
     public  static int state=-1;
     public static String numberOfChannel;
     CallingWithDevice callingWithDevice;
-
+    private int RESULT_LOAD_IMAGE=73;
+    private int positionIntent;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +51,7 @@ public class Agriculture_system extends AppCompatActivity {
 
         Intent intent = getIntent();
         device= (Device) intent.getSerializableExtra("device");
+        positionIntent= (int) intent.getSerializableExtra("positionDevice");
         TextView phoneNumber=(TextView)findViewById(R.id.devicePhoneNumber);
         TextView address=(TextView)findViewById(R.id.deviceAdress);
         phoneNumber.setText("شماره تماس دستگاه: " +device.getPhoneNumber());
@@ -54,8 +62,9 @@ public class Agriculture_system extends AppCompatActivity {
 
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("  "+device.getName());
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.purple));
-        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.purple));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.primary));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.primary));
+
         loadBackdrop();
 
         callingWithDevice=new CallingWithDevice(this,"agricultureSystem",device.getPhoneNumber());
@@ -127,11 +136,44 @@ public class Agriculture_system extends AppCompatActivity {
 
             }
         });
-    }
 
+        FloatingActionButton fb_agriculture=(FloatingActionButton)findViewById(R.id.fb_agricultureSystem);
+        fb_agriculture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, RESULT_LOAD_IMAGE);
+            }
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            device.setDetails(device.getName(),device.getModel(),device.getAddress(),device.getPhoneNumber(),0,false,picturePath);
+            ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            Intent data1 = new Intent();
+            data1.putExtra("device",device);
+            data1.putExtra("positionDevice",positionIntent);
+            setResult(RESULT_OK,data1);
+        }
+    }
     private void loadBackdrop() {
         final ImageView imageView = findViewById(R.id.backdrop);
-        Glide.with(this).load(device.getImage()).asBitmap().centerCrop().into(imageView);
+        if (device.getDefaultImage()){
+            Glide.with(this).load(device.getImage()).asBitmap().centerCrop().into(imageView);
+        }else{
+            Glide.with(this).load(device.getCustomImage()).asBitmap().centerCrop().into(imageView);
+        }
+
     }
 //apply(RequestOptions.centerCropTransform()).into(imageView)
     @Override
@@ -184,6 +226,15 @@ public class Agriculture_system extends AppCompatActivity {
             }
         }
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
     }
     @Override
     public void onPause() {

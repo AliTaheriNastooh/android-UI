@@ -39,14 +39,14 @@ public class MyArrayList<E> extends ArrayList<E> implements Serializable {
     public MyArrayList getObject(Context c,File cacheDir) {
         final File suspend_f=new File(cacheDir, "test");
 
-        MyArrayList simpleClass= null;
+        MyArrayList<Device> simpleClass= null;
         FileInputStream fis = null;
         ObjectInputStream is = null;
 
         try {
             fis = new FileInputStream(suspend_f);
             is = new ObjectInputStream(fis);
-            simpleClass = (MyArrayList) is.readObject();
+            simpleClass = (MyArrayList<Device>) is.readObject();
         } catch(Exception e) {
             String val= e.getMessage();
         } finally {

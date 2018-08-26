@@ -8,19 +8,25 @@ public class Device implements Serializable {
     private String address;
     private String phoneNumber;
     private Integer image;
-    public Device(String _name,String _model,String _address,String _mobileNumber,Integer _imege){
+    private boolean defaultImage;
+    private String customImage;
+    public Device(String _name,String _model,String _address,String _mobileNumber,Integer _imege,boolean _defaultImage,String _customImage){
         name=_name;
         model=_model;
         address=_address;
         phoneNumber=_mobileNumber;
         image=_imege;
+        defaultImage=_defaultImage;
+        customImage=_customImage;
     }
-    public void setDetails(String _name,String _model,String _address,String _mobileNumber,Integer _imege){
+    public void setDetails(String _name,String _model,String _address,String _mobileNumber,Integer _imege,boolean _defaultImage,String _customImage){
         name=_name;
         model=_model;
         address=_address;
         phoneNumber=_mobileNumber;
         image=_imege;
+        defaultImage=_defaultImage;
+        customImage=_customImage;
     }
     String getName(){
         return name;
@@ -37,4 +43,6 @@ public class Device implements Serializable {
     Integer getImage(){
         return image;
     }
+    boolean getDefaultImage(){return defaultImage;}
+    String getCustomImage(){return customImage; }
 }

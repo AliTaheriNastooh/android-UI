@@ -3,6 +3,7 @@ package com.sourcey.materiallogindemo;
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -14,6 +15,8 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.ContextMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -43,11 +46,10 @@ public class chooseDevice extends AppCompatActivity
     ListView listView;
     int counter=1;
     int request_code=1;
+    int requset_code_agriculture=2;
     boolean flagUser=false;
     CustomListAdapter whatever;
     ArrayList<String> nameArray=new ArrayList<String>();
-    ArrayList<String> addressArray=new ArrayList<String>();
-    ArrayList<Integer> imageArray=new ArrayList<Integer>();
     MyArrayList<Device> devices=new MyArrayList<Device>();
     public File cacheDir;
     Device tmp;
@@ -71,7 +73,7 @@ public class chooseDevice extends AppCompatActivity
         else{
             flagUser=true;
         }
-        whatever = new CustomListAdapter(this, nameArray, addressArray, imageArray);
+        whatever = new CustomListAdapter(this, nameArray, devices);
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(whatever);
 
@@ -81,10 +83,12 @@ public class chooseDevice extends AppCompatActivity
                 if(devices.get(position).getModel().equals("agriculture")) {
                     Intent i = new Intent(getApplicationContext(), Agriculture_system.class);
                     i.putExtra("device", devices.get(position));
-                    startActivity(i);
+                    i.putExtra("positionDevice",position);
+                    startActivityForResult(i,requset_code_agriculture);
                 }
             }
         });
+        registerForContextMenu(listView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -98,6 +102,7 @@ public class chooseDevice extends AppCompatActivity
                 ActivityOptions options =
                         ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
               //  startActivity(i, options.toBundle());
+                i.putExtra("editVersion",false);
                 startActivityForResult(i, request_code,options.toBundle());
 
             }
@@ -142,28 +147,86 @@ public class chooseDevice extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == request_code) {
             if (resultCode == RESULT_OK) {
-                String deviceName = data.getStringExtra("deviceName");
-                String deviceModel = data.getStringExtra("deviceModel");
-                String deviceAdress = data.getStringExtra("deviceAddress");
-                String devicePhoneNumber = data.getStringExtra("devicePhoneNumber");
-                Integer deviceImage=R.drawable.face;
-                if(deviceModel.equals("agriculture")){
-                    deviceImage=R.drawable.agriculture;
-                }else if(deviceModel.equals("building")){
-                    deviceImage=R.drawable.building;
-                }else if(deviceModel.equals("parking")){
-                    deviceImage=R.drawable.parking;
+
+                tmp=(Device) data.getSerializableExtra("device");
+                boolean editVersion=data.getBooleanExtra("editVersion",false);
+                if (editVersion){
+                    int devicePosition1=data.getIntExtra("devicePosition",-1);
+                    devices.set(devicePosition1,tmp);
+                    nameArray.set(devicePosition1,tmp.getName());
+                }else{
+                    devices.add(tmp);
+                    nameArray.add(tmp.getName());
                 }
-                tmp=new Device(deviceName,deviceModel,deviceAdress,devicePhoneNumber,deviceImage);
-                devices.add(tmp);
-                setContentOfListView(deviceName,deviceAdress,deviceImage);
+                whatever.notifyDataSetChanged();
+                //setContentOfListView(tmp.getName());
+            }
+        }
+        if (requestCode == requset_code_agriculture) {
+            if (resultCode == RESULT_OK) {
+                Device deviceIntent = (Device) data.getSerializableExtra("device");
+                int devicePosition = data.getIntExtra("positionDevice",0);
+                devices.set(devicePosition,deviceIntent);
+                whatever.notifyDataSetChanged();
             }
         }
     }
-    public void setContentOfListView(String deviceName,String deviceAddress,Integer deviceImage){
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.listView) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle(devices.get(info.position).getName());
+            String[] menuItems = getResources().getStringArray(R.array.createMenuOption_array);
+            for (int i = 0; i<menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        String[] menuItems = getResources().getStringArray(R.array.createMenuOption_array);
+        if(menuItemIndex==0){
+            Intent i = new Intent(getApplicationContext(), SetDeviceDetails.class);
+            ActivityOptions options = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
+            //  startActivity(i, options.toBundle());
+            i.putExtra("editVersion",true);
+            i.putExtra("device",devices.get(info.position));
+            i.putExtra("devicePosition",info.position);
+            startActivityForResult(i, request_code,options.toBundle());
+        }else{
+            if(menuItemIndex==1){
+                AlertDialog.Builder adb=new AlertDialog.Builder(chooseDevice.this);
+                adb.setTitle("Delete?");
+                adb.setMessage("شما مطمئن هستید که میخواهید " +devices.get(info.position).getName()+ "را حذف کنید" );
+                final int positionToRemove = info.position;
+                adb.setNegativeButton("Cancel", null);
+                adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        nameArray.remove(positionToRemove);
+                        devices.remove(positionToRemove);
+
+                        whatever.setDevices(devices);
+
+                        whatever.notifyDataSetChanged();
+                    }});
+                adb.show();
+
+
+            }
+        }
+
+        return true;
+    }
+    public void setContentOfListView(String deviceName){
         nameArray.add(deviceName);
-        addressArray.add(deviceAddress);
-        imageArray.add(deviceImage);
+
         whatever.notifyDataSetChanged();
 
     }
@@ -288,14 +351,17 @@ public class chooseDevice extends AppCompatActivity
     }
     public void loadPreferences(){
 
-        devices = devices.getObject(getApplicationContext(),cacheDir);
+        MyArrayList<Device> devicestmp = devices.getObject(getApplicationContext(),cacheDir);
 
         if(devices!= null) {
+            devices=devicestmp;
+            whatever.setDevices(devices);
             //Toast.makeText(this, "Retrieved object", Toast.LENGTH_LONG).show();
             for(int i=0;i<devices.size();i++){
-                setContentOfListView(devices.get(i).getName(),devices.get(i).getAddress(),devices.get(i).getImage());
+                setContentOfListView(devices.get(i).getName());
             }
         }else {
+
             //Toast.makeText(this, "Error retrieving object", Toast.LENGTH_LONG).show();
 
         }

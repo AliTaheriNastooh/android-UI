@@ -19,7 +19,10 @@
         <item>گزارش کانال ها</item>
         <item>تنظیمات دستگاه</item>
     </string-array>
-
+    <string-array name="createMenuOption_array">
+        <item>ویرایش</item>
+        <item>حذف</item>
+    </string-array>
 
     <string name="start">Start</string>
     <string name="stop">Start</string>

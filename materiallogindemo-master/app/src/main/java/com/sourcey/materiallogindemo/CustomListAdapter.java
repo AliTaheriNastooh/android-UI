@@ -16,30 +16,27 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.ArrayList;
 
+import javax.crypto.spec.DESedeKeySpec;
+
 public class CustomListAdapter extends ArrayAdapter {
     //to reference the Activity
     private final Activity context;
 
     //to store the animal images
-    private final ArrayList<Integer> imageIDarray;
+    private  MyArrayList<Device> devices;
 
-    //to store the list of countries
-    private final ArrayList<String> nameArray;
 
-    //to store the list of countries
-    private final ArrayList<String> infoArray;
-
-    public CustomListAdapter(Activity context, ArrayList<String> nameArrayParam, ArrayList<String> infoArrayParam, ArrayList<Integer> imageIDArrayParam){
+    public CustomListAdapter(Activity context, ArrayList<String> nameArrayParam, MyArrayList<Device> device){
 
         super(context,R.layout.listview_row , nameArrayParam);
 
         this.context=context;
-        this.imageIDarray = imageIDArrayParam;
-        this.nameArray = nameArrayParam;
-        this.infoArray = infoArrayParam;
+        devices=device;
 
     }
-
+    public void setDevices(MyArrayList<Device> _devices){
+        devices=_devices;
+    }
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.listview_row, null,true);
@@ -50,18 +47,31 @@ public class CustomListAdapter extends ArrayAdapter {
         //ImageView imageView = (ImageView) rowView.findViewById(R.id.device_image);
 
         //this code sets the values of the objects to values from the arrays
-        nameTextField.setText(nameArray.get(position));
-        infoTextField.setText(infoArray.get(position));
+        nameTextField.setText(devices.get(position).getName());
+        infoTextField.setText(devices.get(position).getAddress());
       //  imageView.setImageResource(imageIDarray[position]);
-        final ImageView img = (ImageView) rowView.findViewById(R.id.device_image);
-        Glide.with(context).load(imageIDarray.get(position)).asBitmap().fitCenter().into(new BitmapImageViewTarget(img) {
-            @Override
-            protected void setResource(Bitmap resource) {
-                RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                circularBitmapDrawable.setCircular(true);
-                img.setImageDrawable(circularBitmapDrawable);
-            }
-        });
+        if(devices.get(position).getDefaultImage()){
+            final ImageView img = (ImageView) rowView.findViewById(R.id.device_image);
+            Glide.with(context).load(devices.get(position).getImage()).asBitmap().fitCenter().into(new BitmapImageViewTarget(img) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                    circularBitmapDrawable.setCircular(true);
+                    img.setImageDrawable(circularBitmapDrawable);
+                }
+            });
+        }else {
+            final ImageView img = (ImageView) rowView.findViewById(R.id.device_image);
+            Glide.with(context).load(devices.get(position).getCustomImage()).asBitmap().fitCenter().into(new BitmapImageViewTarget(img) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                    circularBitmapDrawable.setCircular(true);
+                    img.setImageDrawable(circularBitmapDrawable);
+                }
+            });
+        }
+
 
 
         return rowView;

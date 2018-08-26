@@ -3,10 +3,10 @@
   <color name="primary">#e43f3f</color>
   <color name="primary_dark">#E12929</color>
   <color name="primary_darker">#CC1D1D</color>
-  <color name="accent">#FFFFFF</color>
+  <color name="accent">#ffffff</color>
   <color name="green">#2bd645</color>
   <color name="purple">#a91c86</color>
-
+  <color name="blue">#2d12a4</color>
   <color name="black">#000000</color>
   <color name="jet">#222222</color>
   <color name="oil">#333333</color>
@@ -19,4 +19,5 @@
   <color name="colorPrimary">#dc40cf</color>
   <color name="colorPrimaryDark">#303F9F</color>
   <color name="colorAccent">#e32d6b</color>
+  <color name="pink">#eb5ad8</color>
 </resources>

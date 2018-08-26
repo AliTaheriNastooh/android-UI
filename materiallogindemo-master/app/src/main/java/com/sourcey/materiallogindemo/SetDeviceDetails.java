@@ -15,6 +15,9 @@ import com.sourcey.materiallogindemo.R;
 
 public class SetDeviceDetails extends AppCompatActivity {
     String stateOfSpinner="nothing";
+    Device device;
+    int devicePosition;
+    boolean editVersion=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,32 @@ public class SetDeviceDetails extends AppCompatActivity {
                 stateOfSpinner="nothing";
             }
         });
+
+        Intent intent = getIntent();
+        editVersion=intent.getBooleanExtra("editVersion",false);
+        if(editVersion) {
+            device = (Device) intent.getSerializableExtra("device");
+            devicePosition=intent.getIntExtra("devicePosition",-1);
+            EditText deviceName=(EditText)findViewById(R.id.editText_devicName);
+            EditText deviceAddress=(EditText)findViewById(R.id.editText_deviceAdress);
+            EditText devicePhoneNumber=(EditText)findViewById(R.id.editText_devicePhoneNumber);
+            deviceName.setText(device.getName());
+            deviceAddress.setText(device.getAddress());
+            devicePhoneNumber.setText(device.getPhoneNumber());
+            if(device.getModel().equals("agriculture")){
+                spinner.setSelection(0);
+            }else{
+                if (device.getModel().equals("building")){
+                    spinner.setSelection(1);
+                }else{
+                    if (device.getModel().equals("parking")){
+                        spinner.setSelection(2);
+                    }
+                }
+            }
+
+
+        }
     }
     public void buttonTaped(View view){
         if(validate()){
@@ -58,10 +87,23 @@ public class SetDeviceDetails extends AppCompatActivity {
             EditText deviceName=(EditText)findViewById(R.id.editText_devicName);
             EditText deviceAddress=(EditText)findViewById(R.id.editText_deviceAdress);
             EditText devicePhoneNumber=(EditText)findViewById(R.id.editText_devicePhoneNumber);
-            data.putExtra("deviceName",deviceName.getText().toString());
-            data.putExtra("deviceAddress",deviceAddress.getText().toString());
-            data.putExtra("devicePhoneNumber",devicePhoneNumber.getText().toString());
-            data.putExtra("deviceModel",stateOfSpinner);
+            if (editVersion){
+                device.setDetails(deviceName.getText().toString(),stateOfSpinner,deviceAddress.getText().toString(),devicePhoneNumber.getText().toString(),device.getImage(),device.getDefaultImage(),device.getCustomImage());
+            }else{
+                Integer deviceImage=R.drawable.face;
+                if(stateOfSpinner.equals("agriculture")){
+                    deviceImage=R.drawable.agriculture;
+                }else if(stateOfSpinner.equals("building")){
+                    deviceImage=R.drawable.building;
+                }else if(stateOfSpinner.equals("parking")){
+                    deviceImage=R.drawable.parking;
+                }
+                device=new Device(deviceName.getText().toString(),stateOfSpinner,deviceAddress.getText().toString(),devicePhoneNumber.getText().toString(),deviceImage,true,"");
+            }
+
+            data.putExtra("device",device);
+            data.putExtra("editVersion",editVersion);
+            data.putExtra("devicePosition",devicePosition);
             setResult(RESULT_OK,data);
             finish();
         }
