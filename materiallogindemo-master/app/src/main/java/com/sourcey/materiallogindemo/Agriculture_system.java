@@ -8,8 +8,12 @@ import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,19 +21,27 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+
+import static java.security.AccessController.getContext;
 
 public class Agriculture_system extends AppCompatActivity {
 
@@ -39,10 +51,15 @@ public class Agriculture_system extends AppCompatActivity {
     /////////////////////
     private Switch simpleSwitch;
     private LinearLayout getNumberOfChannel;
+    MyRecyclerViewAdapter adapter;
+    ArrayList<String> nameArray=new ArrayList<String>();
+    MyArrayList<Operation> operations=new MyArrayList<Operation>();
+
     public  static int state=-1;
     public static String numberOfChannel;
     CallingWithDevice callingWithDevice;
     private int RESULT_LOAD_IMAGE=73;
+    private int RESULT_GET_DETAIL=75;
     private int positionIntent;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +77,24 @@ public class Agriculture_system extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewOfOperation);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new MyRecyclerViewAdapter(this, operations);
+       // adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.my_divider));
+        recyclerView.addItemDecoration(itemDecorator);
+//        listView.setOnTouchListener(new View.OnTouchListener() {
+//            // Setting on Touch Listener for handling the touch inside ScrollView
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                // Disallow the touch request for parent scroll on touch of child view
+//                v.getParent().requestDisallowInterceptTouchEvent(true);
+//                return false;
+//            }
+//        });
+       // setListViewHeightBasedOnChildren(listView);
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("  "+device.getName());
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.primary));
@@ -71,11 +106,7 @@ public class Agriculture_system extends AppCompatActivity {
 
         //////////////////////////
         simpleSwitch = (Switch) findViewById(R.id.simpleSwitch);
-        TextView textOfToggleButton=(TextView)findViewById(R.id.textViewOfToogleButton);
-        textOfToggleButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
 
-        final TextView textOfChooseAmaliat=(TextView)findViewById(R.id.textofChooseAmaliat);
-        textOfChooseAmaliat.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
 
         getNumberOfChannel=(LinearLayout)findViewById(R.id.layoutOfGetChannelNumber);
         getNumberOfChannel.setVisibility(View.INVISIBLE);
@@ -84,7 +115,7 @@ public class Agriculture_system extends AppCompatActivity {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.Activity_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter,"فرآیند را انتخاب کنید");
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -94,18 +125,24 @@ public class Agriculture_system extends AppCompatActivity {
                     case 0:
                         TextView textOfGetChannelNumber= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
                         state=1;
-                        textOfGetChannelNumber.setText("شماره کانال مورد نظر برای تنظیم راوارد کرده و دکمه تماس را بفشارید:");
+                        textOfGetChannelNumber.setText("شماره کانال مورد نظر برای روشن کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
                         getNumberOfChannel.setVisibility(View.VISIBLE);
                         break;
                     case 1:
                         TextView textOfGetChannelNumber1= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
                         state=2;
-                        textOfGetChannelNumber1.setText("شماره کانال مورد نظر برای دریافت گزارش راوارد کرده و دکمه تماس را بفشارید:");
+                        textOfGetChannelNumber1.setText("شماره کانال مورد نظر برای خاموش کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
                         getNumberOfChannel.setVisibility(View.VISIBLE);
                         break;
                     case 2:
+                        TextView textOfGetChannelNumber2= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
                         state=3;
-                        setIntentToNextPage("configDevice");
+                        textOfGetChannelNumber2.setText("شماره کانال مورد نظر برای دریافت گزارش را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
+                        getNumberOfChannel.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        state=4;
+                        //setIntentToNextPage("configDevice");
                         break;
                     default:
 
@@ -120,22 +157,31 @@ public class Agriculture_system extends AppCompatActivity {
                 // TODO Auto-generated method stub
             }
         });
-        EditText ChannelNumber=(EditText)findViewById(R.id.editTextGetChannel);
-        ChannelNumber.addTextChangedListener(new TextWatcher() {
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+
+
+
+        NoDefaultSpinner spinner2 = (NoDefaultSpinner) findViewById(R.id.spinnerOfGetChannelNumber);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+                R.array.channelNumber_array, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner2.setAdapter(adapter2,"کانال را انتخاب کنید:");
+        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                numberOfChannel=String.valueOf(position+1);
             }
 
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            public void afterTextChanged(Editable editable) {
-                numberOfChannel=editable.toString();
-                Log.i("me-------:",numberOfChannel);
-
+            public void onNothingSelected(AdapterView<?> parent) {
+                numberOfChannel=String.valueOf(-1);
             }
         });
+
+
+
+
 
         FloatingActionButton fb_agriculture=(FloatingActionButton)findViewById(R.id.fb_agricultureSystem);
         fb_agriculture.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +211,41 @@ public class Agriculture_system extends AppCompatActivity {
             data1.putExtra("positionDevice",positionIntent);
             setResult(RESULT_OK,data1);
         }
+        if (requestCode == RESULT_GET_DETAIL && resultCode == RESULT_OK && null != data) {
+
+            Operation tmp=(Operation) data.getSerializableExtra("operation");
+            nameArray.add(tmp.getTitle());
+            tmp.setTitle(tmp.getTitle()+numberOfChannel);
+            operations.add(tmp);
+            adapter.notifyDataSetChanged();
+        }
     }
+
+    /**** Method for Setting the Height of the ListView dynamically.
+     **** Hack to fix the issue of not showing all the items of the ListView
+     **** when placed inside a ScrollView  ****/
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
+
+
     private void loadBackdrop() {
         final ImageView imageView = findViewById(R.id.backdrop);
         if (device.getDefaultImage()){
@@ -184,11 +264,15 @@ public class Agriculture_system extends AppCompatActivity {
 
     //////////////////////////
 
-    public void CallButtonForGetChannel(View view){
+    public void callButtonForNextState(View view){
+        goToNextPage(" ");
+    }
+
+    /////////////////////////
+    public void CallButtonForSetOperation(View view){
 
         String setMessage="";
-        EditText getChannelNumber=(EditText)findViewById(R.id.editTextGetChannel);
-        setMessage=state+"#"+getChannelNumber.getText().toString();
+        setMessage=state+"#"+numberOfChannel;
         callingWithDevice.connectWithDevice(simpleSwitch.isChecked(),setMessage);
     }
 
@@ -206,25 +290,46 @@ public class Agriculture_system extends AppCompatActivity {
         intent1.putExtra(EXTRA_MESSAGE1+"1", message);
         intent1.putExtra(EXTRA_MESSAGE1+"2",device);
         intent1.putExtra(EXTRA_MESSAGE1+"3", numberOfChannel);
-        startActivity(intent1);
+        startActivityForResult(intent1,RESULT_GET_DETAIL);
     }
     public void goToNextPage(String channelState){
-        if(state==1){
-            if(channelState.equals("0")){
+        switch (state){
+            case 1:
                 setIntentToNextPage("Channeloff");
-            }
-            if(channelState.equals("1")){
+                break;
+            case 2:
                 setIntentToNextPage("Channelon");
-            }
+
+                break;
+
+            case 3:
+                ///
+                break;
+
+            case 4:
+                setIntentToNextPage("configDevice");
+                break;
+
+            default:
+
         }
-        if(state==2){
-            if(channelState.equals("0")){
-                setIntentToNextPage("ShowChannelStateOff");
-            }
-            if(channelState.equals("1")){
-                setIntentToNextPage("ShowChannelStateOn");
-            }
-        }
+
+//        if(state==1){
+//            if(channelState.equals("0")){
+//                setIntentToNextPage("Channeloff");
+//            }
+//            if(channelState.equals("1")){
+//                setIntentToNextPage("Channelon");
+//            }
+//        }
+//        if(state==2){
+//            if(channelState.equals("0")){
+//                setIntentToNextPage("ShowChannelStateOff");
+//            }
+//            if(channelState.equals("1")){
+//                setIntentToNextPage("ShowChannelStateOn");
+//            }
+//        }
 
     }
     @Override

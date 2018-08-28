@@ -13,49 +13,101 @@ import java.util.ArrayList;
 public class MyArrayList<E> extends ArrayList<E> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public boolean saveObject(MyArrayList obj,File cacheDir) {
-        final File suspend_f=new File(cacheDir, "test");
+    public boolean saveObject(MyArrayList obj,File cacheDir,String whicClass) {
+        if (whicClass.equals("Operation")) {
+            final File suspend_f = new File(cacheDir, "Operation");
 
-        FileOutputStream fos  = null;
-        ObjectOutputStream oos  = null;
-        boolean            keep = true;
+            FileOutputStream fos = null;
+            ObjectOutputStream oos = null;
+            boolean keep = true;
 
-        try {
-            fos = new FileOutputStream(suspend_f);
-            oos = new ObjectOutputStream(fos);
-            oos.writeObject(obj);
-        } catch (Exception e) {
-            keep = false;
-        } finally {
             try {
-                if (oos != null)   oos.close();
-                if (fos != null)   fos.close();
-                if (keep == false) suspend_f.delete();
-            } catch (Exception e) { /* do nothing */ }
-        }
+                fos = new FileOutputStream(suspend_f);
+                oos = new ObjectOutputStream(fos);
+                oos.writeObject(obj);
+            } catch (Exception e) {
+                keep = false;
+            } finally {
+                try {
+                    if (oos != null) oos.close();
+                    if (fos != null) fos.close();
+                    if (keep == false) suspend_f.delete();
+                } catch (Exception e) { /* do nothing */ }
+            }
 
-        return keep;
+            return keep;
+        }
+        if (whicClass.equals("Device")){
+            final File suspend_f = new File(cacheDir, "Device");
+
+            FileOutputStream fos = null;
+            ObjectOutputStream oos = null;
+            boolean keep = true;
+
+            try {
+                fos = new FileOutputStream(suspend_f);
+                oos = new ObjectOutputStream(fos);
+                oos.writeObject(obj);
+            } catch (Exception e) {
+                keep = false;
+            } finally {
+                try {
+                    if (oos != null) oos.close();
+                    if (fos != null) fos.close();
+                    if (keep == false) suspend_f.delete();
+                } catch (Exception e) { /* do nothing */ }
+            }
+
+            return keep;
+        }
+        return false;
     }
-    public MyArrayList getObject(Context c,File cacheDir) {
-        final File suspend_f=new File(cacheDir, "test");
 
-        MyArrayList<Device> simpleClass= null;
-        FileInputStream fis = null;
-        ObjectInputStream is = null;
 
-        try {
-            fis = new FileInputStream(suspend_f);
-            is = new ObjectInputStream(fis);
-            simpleClass = (MyArrayList<Device>) is.readObject();
-        } catch(Exception e) {
-            String val= e.getMessage();
-        } finally {
+    public MyArrayList getObject(Context c,File cacheDir,String whicClass) {
+
+        if (whicClass.equals("Operation")){
+            final File suspend_f=new File(cacheDir, "Operation");
+            MyArrayList<Operation> simpleClass= null;
+            FileInputStream fis = null;
+            ObjectInputStream is = null;
+
             try {
-                if (fis != null)   fis.close();
-                if (is != null)   is.close();
-            } catch (Exception e) { }
-        }
+                fis = new FileInputStream(suspend_f);
+                is = new ObjectInputStream(fis);
+                simpleClass = (MyArrayList<Operation>) is.readObject();
+            } catch(Exception e) {
+                String val= e.getMessage();
+            } finally {
+                try {
+                    if (fis != null)   fis.close();
+                    if (is != null)   is.close();
+                } catch (Exception e) { }
+            }
 
-        return simpleClass;
+            return simpleClass;
+        }
+        if (whicClass.equals("Device")){
+            final File suspend_f=new File(cacheDir, "Device");
+            MyArrayList<Device> simpleClass= null;
+            FileInputStream fis = null;
+            ObjectInputStream is = null;
+
+            try {
+                fis = new FileInputStream(suspend_f);
+                is = new ObjectInputStream(fis);
+                simpleClass = (MyArrayList<Device>) is.readObject();
+            } catch(Exception e) {
+                String val= e.getMessage();
+            } finally {
+                try {
+                    if (fis != null)   fis.close();
+                    if (is != null)   is.close();
+                } catch (Exception e) { }
+            }
+
+            return simpleClass;
+        }
+        return  null;
     }
 }

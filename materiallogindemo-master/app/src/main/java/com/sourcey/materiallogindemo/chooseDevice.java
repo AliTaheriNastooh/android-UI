@@ -351,9 +351,9 @@ public class chooseDevice extends AppCompatActivity
     }
     public void loadPreferences(){
 
-        MyArrayList<Device> devicestmp = devices.getObject(getApplicationContext(),cacheDir);
+        MyArrayList<Device> devicestmp = devices.getObject(getApplicationContext(),cacheDir,"Device");
 
-        if(devices!= null) {
+        if(devicestmp!= null) {
             devices=devicestmp;
             whatever.setDevices(devices);
             //Toast.makeText(this, "Retrieved object", Toast.LENGTH_LONG).show();
@@ -389,7 +389,7 @@ public class chooseDevice extends AppCompatActivity
         editor.putString(MainActivity.PREFS_MOBILE, mobileValue);
         editor.putString(MainActivity.PREF_REMEMBER, rememberValue);
         editor.commit();
-        boolean result =devices.saveObject(devices,cacheDir);
+        boolean result =devices.saveObject(devices,cacheDir,"Device");
         boolean resultUser=user.saveObject(user,cacheDir);
     }
 }

@@ -143,6 +143,36 @@ public class Channel_Off extends Fragment {
                 return "error";
         }
     }
+
+    public String[] getStringForOperation(){
+        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfChannelOff);
+        switch (rGroup.getCheckedRadioButtonId()){
+            case R.id.radioButtonOfOpenImmediate:
+                EditText timeOfOpen = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
+                String[] tmp={"باز کردن کانال    " ,"باز کردن به صورت فوری و مدت باز بودن: " +timeOfOpen.getText().toString()};
+                return tmp;
+            case R.id.radioButtonOfOpenWithDelay:
+                EditText startTimeToOpneInHour = (EditText)getActivity().findViewById(R.id.editTextOfstartOpenInHour);
+                EditText startTimeToOpneInMinute = (EditText)getActivity().findViewById(R.id.editTextOfStartToOpenInMinute);
+                EditText timeOfOpen2 = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
+
+                String[] tmp2={"باز کردن کانال    " ,"باز کردن کانال با تاخیر و مدت زمان باز بودن: "  +timeOfOpen2.getText().toString()+ "زمان باز شدن: " +startTimeToOpneInHour.getText().toString()+" : "+startTimeToOpneInMinute.getText().toString()};
+                return tmp2;
+            case R.id.radioButtonOfPeriodicProgram:
+                EditText startTimeToOpneInHour3 = (EditText)getActivity().findViewById(R.id.editTextOfstartOpenInHour);
+                EditText startTimeToOpneInMinute3 = (EditText)getActivity().findViewById(R.id.editTextOfStartToOpenInMinute);
+                EditText timeOfOpen3 = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
+                EditText periodicTime3 = (EditText)getActivity().findViewById(R.id.editTextOfPeriodicTime);
+                String[] tmp3={"باز کردن کانال    " ,"باز کردن کانال به صورت دوره ایی و مدت زمان باز بودن: " +timeOfOpen3.getText().toString()+ "مدت دوره باز شدن" +periodicTime3.getText().toString() + "زمان باز شدن: " +startTimeToOpneInHour3.getText().toString()+" : "+startTimeToOpneInMinute3.getText().toString()};
+                return tmp3;
+            case R.id.radioButtonOfDeleteOrder:
+                String[] tmp4={"باز کردن کانال    " ,"حذف دستورها"};
+                return tmp4;
+            default:
+                String[] tmp5={"error" ,"error" };
+                return tmp5;
+        }
+    }
 //    public String getStringCall(){
 //        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfChannelOff);
 //        switch (rGroup.getCheckedRadioButtonId()){

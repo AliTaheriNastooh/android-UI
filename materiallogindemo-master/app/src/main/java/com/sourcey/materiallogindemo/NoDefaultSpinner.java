@@ -15,9 +15,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class NoDefaultSpinner extends Spinner {
-
+    String defaultValue="";
     public NoDefaultSpinner(Context context) {
         super(context);
+
     }
 
     public NoDefaultSpinner(Context context, AttributeSet attrs) {
@@ -49,7 +50,27 @@ public class NoDefaultSpinner extends Spinner {
             throw new RuntimeException(e);
         }
     }
+    public void setAdapter(SpinnerAdapter orig,String _defaultValue ) {
+        defaultValue=_defaultValue;
+        final SpinnerAdapter adapter = newProxy(orig);
 
+        super.setAdapter(adapter);
+
+        try {
+            final Method m = AdapterView.class.getDeclaredMethod(
+                    "setNextSelectedPositionInt",int.class);
+            m.setAccessible(true);
+            m.invoke(this,-1);
+
+            final Method n = AdapterView.class.getDeclaredMethod(
+                    "setSelectedPositionInt",int.class);
+            n.setAccessible(true);
+            n.invoke(this,-1);
+        }
+        catch( Exception e ) {
+            throw new RuntimeException(e);
+        }
+    }
     protected SpinnerAdapter newProxy(SpinnerAdapter obj) {
         return (SpinnerAdapter) java.lang.reflect.Proxy.newProxyInstance(
                 obj.getClass().getClassLoader(),
@@ -102,7 +123,7 @@ public class NoDefaultSpinner extends Spinner {
                         (TextView) ((LayoutInflater)getContext().getSystemService(
                                 Context.LAYOUT_INFLATER_SERVICE)).inflate(
                                 android.R.layout.simple_spinner_item,parent,false);
-                v.setText("فرآیند را انتخاب کنید:");
+                v.setText(defaultValue);
                 return v;
             }
             return obj.getView(position,convertView,parent);

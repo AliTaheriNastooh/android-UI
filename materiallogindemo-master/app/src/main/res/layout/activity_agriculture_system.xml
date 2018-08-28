@@ -61,6 +61,8 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -108,37 +110,14 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:paddingTop="20dp">
 
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textViewOfToogleButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_weight="1"
-                        android:paddingRight="10dp"
-                        android:text="نحوه ارتباط با دستگاه را مشخص کنید" />
-
-                    <Switch
-                        android:id="@+id/simpleSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_weight="1"
-                        android:textOff="Call"
-                        android:textOn="SMS" />
-
-                </LinearLayout>
 
                 <TextView
                     android:id="@+id/textofChooseAmaliat"
@@ -146,12 +125,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="20dp"
-                    android:text="فرآیند را از لیست پایین انتخاب کنید:" />
+                    android:gravity="center_horizontal"
+                    android:text="فرآیند را از لیست پایین انتخاب کنید:"
+                    android:textColor="@color/primary" />
 
                 <com.sourcey.materiallogindemo.NoDefaultSpinner
                     android:id="@+id/spinnerOfActivity"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp" />
 
                 <LinearLayout
                     android:id="@+id/layoutOfGetChannelNumber"
@@ -164,35 +146,102 @@
                         android:id="@+id/textViewOfGetChannelNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="شماره کانال را وارد کرده و  دکمه تماس را بفشارید:"
-                        android:textColor="@android:color/holo_red_light"
-                        android:textSize="18sp" />
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_horizontal"
+                        android:text="شماره کانال را وارد کرده و  دکمه مرحله بعد را بفشارید:"
+                        android:textColor="@color/primary" />
 
-                    <EditText
-                        android:id="@+id/editTextGetChannel"
+                    <com.sourcey.materiallogindemo.NoDefaultSpinner
+                        android:id="@+id/spinnerOfGetChannelNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:ems="10"
-                        android:hint="شماره کانال را وارد کنید:"
-                        android:inputType="numberDecimal" />
+                        android:layout_margin="20dp" />
 
                     <Button
                         android:id="@+id/buttonofCallDevice"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="20dp"
-                        android:onClick="CallButtonForGetChannel"
-                        android:text="تماس" />
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginTop="24dp"
+                        android:background="@color/primary_darker"
+                        android:onClick="callButtonForNextState"
+                        android:padding="12dp"
+                        android:text="مرحله بعد" />
                 </LinearLayout>
 
 
             </LinearLayout>
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@android:color/darker_gray" />
 
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="عملیات ها"
+                android:textColor="@color/primary" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@color/lightRed"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerViewOfOperation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewOfToogleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:paddingRight="10dp"
+                    android:text="نحوه ارتباط با دستگاه را مشخص کنید" />
+
+                <Switch
+                    android:id="@+id/simpleSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:textOff="Call"
+                    android:textOn="SMS" />
+
+            </LinearLayout>
+            <Button
+                android:id="@+id/buttonofSetOperation"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="24dp"
+                android:background="@color/primary_darker"
+                android:onClick="CallButtonForSetOperation"
+                android:padding="12dp"
+                android:text="اعمال تغییرات" />
 
         </LinearLayout>
 

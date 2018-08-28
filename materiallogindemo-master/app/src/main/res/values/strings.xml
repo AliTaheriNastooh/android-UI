@@ -15,9 +15,25 @@
         <item>سیستم هوشمند سازی پارکینگ</item>
     </string-array>
     <string-array name="Activity_array">
-        <item>تنظیم کانال ها</item>
-        <item>گزارش کانال ها</item>
+        <item>روشن کردن کانال</item>
+        <item>خاموش کردن کانال</item>
+        <item>گرفتن گزارش کانال</item>
         <item>تنظیمات دستگاه</item>
+    </string-array>
+
+    <string-array name="channelNumber_array">
+        <item>کانال 1</item>
+        <item>کانال 2</item>
+        <item>کانال 3</item>
+        <item>کانال 4</item>
+        <item>کانال 5</item>
+        <item>کانال 6</item>
+        <item>کانال 7</item>
+        <item>کانال 8</item>
+        <item>کانال 9</item>
+        <item>کانال 10</item>
+        <item>کانال 11</item>
+        <item>کانال 12</item>
     </string-array>
     <string-array name="createMenuOption_array">
         <item>ویرایش</item>

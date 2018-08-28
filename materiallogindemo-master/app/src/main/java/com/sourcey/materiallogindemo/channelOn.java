@@ -36,6 +36,22 @@ public class channelOn extends Fragment {
                 return "error";
         }
     }
+
+    public String[] getStringForOperation(){
+        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfChannelOn);
+        switch (rGroup.getCheckedRadioButtonId()){
+            case R.id.radioButtonOfDeleteProject:
+                String[] tmp={"بستن کانال          " ,"پاک کردن پروژه " };
+                return tmp;
+            case R.id.radioButtonOfCloseChannel:
+                String[] tmp2={"بستن کانال          " ,"بستن کانال " };
+                return tmp2;
+
+            default:
+                String[] tmp3={"error          " ,"error" };
+                return tmp3;
+        }
+    }
 //    public String getStringCall(){
 //        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfChannelOn);
 //        switch (rGroup.getCheckedRadioButtonId()){

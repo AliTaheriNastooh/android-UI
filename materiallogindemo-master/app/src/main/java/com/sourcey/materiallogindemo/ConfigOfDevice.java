@@ -96,8 +96,55 @@ public class ConfigOfDevice extends Fragment {
         return view;
 
     }
+    public boolean validate(){
+        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfConfigDevice);
+        switch (rGroup.getCheckedRadioButtonId()){
+            case R.id.radioButtonOfNumbersList:
+                return true;
+            case R.id.radioButtonOfAddNumber:
+                EditText number = (EditText)getActivity().findViewById(R.id.addNumberToConfigList);
+                return true;
+            case R.id.radioButtonOfsetDate:
+                EditText year = (EditText)getActivity().findViewById(R.id.editTextOfSetYear);
+                EditText month = (EditText)getActivity().findViewById(R.id.editTextOfSetMonth);
+                EditText day = (EditText)getActivity().findViewById(R.id.editTextOfsetDay);
+                String sYear="";
+                String sMonth="";
+                String sDay="";
+                if(year.getText().length()>4){
+                    year.setError("سال ورودی باید 4 رقم باشد");
+                    return false;
+                }
+                if(month.getText().length()>2){
+                    month.setError("ماه ورودی باید 2 رقم باشد");
+                    return false;
+                }
+                if(day.getText().length()>2){
+                    day.setError("روز ورودی باید 2 رقم باشد");
+                    return false;
+                }
+                return true;
+            case R.id.radioButtonOfsetTime:
 
+                EditText minute = (EditText)getActivity().findViewById(R.id.editTextOfSetMinute);
+                EditText hour = (EditText)getActivity().findViewById(R.id.editTextOfSetHour);
+                if(minute.getText().length()>2){
+                    minute.setError("دقیقه ورودی باید 2 رقم باشد");
+                    return false;
+                }
+                if(hour.getText().length()>2){
+                    hour.setError("ساعت ورودی باید 2 رقم باشد");
+                    return false;
+                }
+                return true;
+            default:
+                return false;
+        }
+    }
     public String getString(){
+        if (!validate()){
+            return "error";
+        }
         RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfConfigDevice);
         switch (rGroup.getCheckedRadioButtonId()){
             case R.id.radioButtonOfNumbersList:
@@ -112,18 +159,6 @@ public class ConfigOfDevice extends Fragment {
                 String sYear="";
                 String sMonth="";
                 String sDay="";
-                if(year.getText().length()>4){
-                    year.setError("سال ورودی باید 4 رقم باشد");
-                    return "error";
-                }
-                if(month.getText().length()>2){
-                    month.setError("ماه ورودی باید 2 رقم باشد");
-                    return "error";
-                }
-                if(day.getText().length()>2){
-                    day.setError("روز ورودی باید 2 رقم باشد");
-                    return "error";
-                }
                 if(year.getText().length()==1 ){
                     sYear="0"+year.getText().toString().charAt(0);
                 }
@@ -150,14 +185,6 @@ public class ConfigOfDevice extends Fragment {
 
                 EditText minute = (EditText)getActivity().findViewById(R.id.editTextOfSetMinute);
                 EditText hour = (EditText)getActivity().findViewById(R.id.editTextOfSetHour);
-                if(minute.getText().length()>2){
-                    minute.setError("دقیقه ورودی باید 2 رقم باشد");
-                    return "error";
-                }
-                if(hour.getText().length()>2){
-                    hour.setError("ساعت ورودی باید 2 رقم باشد");
-                    return "error";
-                }
                 String sminute="";
                 String shour="";
                 if(minute.getText().length()==1 ){
@@ -175,6 +202,76 @@ public class ConfigOfDevice extends Fragment {
                 return "3#"+shour+sminute;
             default:
                 return "error";
+        }
+    }
+
+    public String[] getStringForOperation(){
+        String[] tmp={"error","error"};
+        if (!validate()){
+
+            return tmp;
+        }
+        RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfConfigDevice);
+        switch (rGroup.getCheckedRadioButtonId()){
+            case R.id.radioButtonOfNumbersList:
+                String[] tmp1={"تنظیمات دستگاه" ,"گرفتن لیست شماره ها" };
+                return tmp1;
+            case R.id.radioButtonOfAddNumber:
+                EditText number = (EditText)getActivity().findViewById(R.id.addNumberToConfigList);
+                String[] tmp2={"تنظیمات دستگاه" , "اضافه کردن شماره:" +number.getText().toString()};
+                return tmp2;
+            case R.id.radioButtonOfsetDate:
+                EditText year = (EditText)getActivity().findViewById(R.id.editTextOfSetYear);
+                EditText month = (EditText)getActivity().findViewById(R.id.editTextOfSetMonth);
+                EditText day = (EditText)getActivity().findViewById(R.id.editTextOfsetDay);
+                String sYear="";
+                String sMonth="";
+                String sDay="";
+                if(year.getText().length()==1 ){
+                    sYear="0"+year.getText().toString().charAt(0);
+                }
+                if(year.getText().length()==4){
+                    sYear=year.getText().toString().substring(2);
+                }
+                if(year.getText().length()==2){
+                    sYear=year.getText().toString();
+                }
+                if(month.getText().length()==1 ){
+                    sMonth="0"+month.getText().toString().charAt(0);
+                }
+                if(month.getText().length()==2){
+                    sMonth=month.getText().toString();
+                }
+                if(day.getText().length()==1 ){
+                    sDay="0"+day.getText().toString().charAt(0);
+                }
+                if(day.getText().length()==2){
+                    sDay=day.getText().toString();
+                }
+                String[] tmp3={"تنظیمات دستگاه" , "تنظیم تاریخ به: " +sDay+"/"+sMonth+"/"+sYear};
+                return tmp3;
+            case R.id.radioButtonOfsetTime:
+
+                EditText minute = (EditText)getActivity().findViewById(R.id.editTextOfSetMinute);
+                EditText hour = (EditText)getActivity().findViewById(R.id.editTextOfSetHour);
+                String sminute="";
+                String shour="";
+                if(minute.getText().length()==1 ){
+                    sminute="0"+minute.getText().toString().charAt(0);
+                }
+                if(minute.getText().length()==2){
+                    sminute=minute.getText().toString();
+                }
+                if(hour.getText().length()==1 ){
+                    shour="0"+hour.getText().toString().charAt(0);
+                }
+                if(hour.getText().length()==2){
+                    shour=hour.getText().toString();
+                }
+                String[] tmp4={"تنظیمات دستگاه" , "تنظیم زمان به: " +minute+":"+shour};
+                return tmp4;
+            default:
+                return tmp;
         }
     }
 //    public String getStringCall(){

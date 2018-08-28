@@ -23,11 +23,11 @@ public class SetDeviceDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_device_details);
 
-        NoDefaultSpinner2 spinner = (NoDefaultSpinner2) findViewById(R.id.spinnerOfDevice);
+        NoDefaultSpinner spinner = (NoDefaultSpinner) findViewById(R.id.spinnerOfDevice);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.device_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter,"نوع دستگاه را انتخاب کنید : ");
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             public void onItemSelected(AdapterView<?> parent, View view,

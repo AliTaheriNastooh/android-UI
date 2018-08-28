@@ -158,6 +158,20 @@ public class GetDetails extends AppCompatActivity {
         }
 
     }
+    public String getTime(){
+        Date currentTime = Calendar.getInstance().getTime();
+        return Integer.toString(currentTime.getHours())+":"+Integer.toString(currentTime.getMinutes());
+    }
+    public String  getDate(){
+        Calendar cal= Calendar.getInstance();
+        int yearm=cal.get(Calendar.YEAR);
+        int monthm=cal.get(Calendar.MONTH)+1;
+        int daym=cal.get(Calendar.DAY_OF_MONTH);
+
+        JalaliCalendar.gDate miladiCal=new JalaliCalendar.gDate(yearm,monthm,daym);
+        JalaliCalendar.gDate jalaliCal= JalaliCalendar.MiladiToJalali(miladiCal);
+        return Integer.toString(jalaliCal.getYear())+"/"+Integer.toString(jalaliCal.getMonth())+"/"+Integer.toString(jalaliCal.getDay());
+    }
     public void setTime(View view){
         Date currentTime = Calendar.getInstance().getTime();
         EditText editTextOfMinute=(EditText) findViewById(R.id.editTextOfSetMinute);
@@ -185,6 +199,65 @@ public class GetDetails extends AppCompatActivity {
         editTextOfyear.setText(Integer.toString(jalaliCal.getYear()).substring(2));
         editTextOfyear.setEnabled(false);
     }
+
+
+    public void setDetails2(View view) {
+        String getedString = "";
+        Operation returnOperation=new Operation();
+        if (newFragment.equals("Channeloff")) {
+            Channel_Off fragment = (Channel_Off) getSupportFragmentManager().findFragmentByTag("Channeloff");
+            getedString = fragment.getString();
+            String[] stringForOperation=fragment.getStringForOperation();
+            if (getedString.equals("error") || stringForOperation[0].equals("error")) {
+                return;
+            }else {
+
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+            }
+        }
+        if (newFragment.equals("Channelon")) {
+            channelOn fragment = (channelOn) getSupportFragmentManager().findFragmentByTag("Channelon");
+            getedString = fragment.getString();
+            String[] stringForOperation=fragment.getStringForOperation();
+            if (getedString.equals("error")) {
+                return;
+            }else {
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+            }
+
+        }
+        if (newFragment.equals("ShowChannelStateOff")) {
+            return;
+        }
+        if (newFragment.equals("ShowChannelStateOn")) {
+            return;
+        }
+        if(newFragment.equals("showOperationCorrect")){
+            return;
+        }
+        if(newFragment.equals("showOperationWrong")){
+            return;
+        }
+
+        if (newFragment.equals("configDevice")) {
+            ConfigOfDevice fragment = (ConfigOfDevice) getSupportFragmentManager().findFragmentByTag("configDevice");
+            getedString = fragment.getString();
+            String[] stringForOperation=fragment.getStringForOperation();
+            if (getedString.equals("error")) {
+                return;
+            } else {
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+
+            }
+
+        }
+        Intent data = new Intent();
+        data.putExtra("operation",returnOperation);
+        setResult(RESULT_OK,data);
+        finish();
+    }
+
+
     public void setDetails(View view) {
         String getedString = "";
         if (newFragment.equals("Channeloff")) {

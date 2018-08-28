@@ -20,4 +20,6 @@
   <color name="colorPrimaryDark">#303F9F</color>
   <color name="colorAccent">#e32d6b</color>
   <color name="pink">#eb5ad8</color>
+  <color name="choose1">#ead6e7</color>
+  <color name="lightRed">#ff859f</color>
 </resources>

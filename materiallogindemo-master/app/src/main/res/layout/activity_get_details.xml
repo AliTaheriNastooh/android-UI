@@ -99,7 +99,7 @@
                 android:id="@+id/buttonOfGetDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="setDetails"
+                android:onClick="setDetails2"
                 android:text="اعمال تغییرات" />
         </LinearLayout>
 
