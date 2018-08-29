@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +21,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,13 +41,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.security.AccessController.getContext;
 
-public class Agriculture_system extends AppCompatActivity {
+public class Agriculture_system extends AppCompatActivity implements ActionMode.Callback{
 
     public static final String EXTRA_NAME = "cheese_name";
     Device device;
@@ -54,17 +61,28 @@ public class Agriculture_system extends AppCompatActivity {
     MyRecyclerViewAdapter adapter;
     ArrayList<String> nameArray=new ArrayList<String>();
     MyArrayList<Operation> operations=new MyArrayList<Operation>();
-
+    public File cacheDir;
     public  static int state=-1;
     public static String numberOfChannel;
     CallingWithDevice callingWithDevice;
     private int RESULT_LOAD_IMAGE=73;
     private int RESULT_GET_DETAIL=75;
     private int positionIntent;
+    private ActionMode actionMode;
+    private boolean isMultiSelect = false;
+    private List<String> selectedIds = new ArrayList<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agriculture_system);
+
+
+        if(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
+            cacheDir=new File(android.os.Environment.getExternalStorageDirectory(),"MyCustomObject");
+        else
+            cacheDir= getCacheDir();
+        if(!cacheDir.exists())
+            cacheDir.mkdirs();
 
         Intent intent = getIntent();
         device= (Device) intent.getSerializableExtra("device");
@@ -74,7 +92,7 @@ public class Agriculture_system extends AppCompatActivity {
         phoneNumber.setText("شماره تماس دستگاه: " +device.getPhoneNumber());
         address.setText( "آدرس دستگاه: " +device.getAddress());
         final Toolbar toolbar = findViewById(R.id.toolbar2);
-        setSupportActionBar(toolbar);
+       setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerViewOfOperation);
@@ -85,6 +103,30 @@ public class Agriculture_system extends AppCompatActivity {
         DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.my_divider));
         recyclerView.addItemDecoration(itemDecorator);
+
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (isMultiSelect){
+                    //if multiple selection is enabled then select item on single click else perform normal click on item.
+                    multiSelect(position);
+                }
+            }
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (!isMultiSelect){
+                    selectedIds = new ArrayList<>();
+                    isMultiSelect = true;
+
+                    if (actionMode == null){
+                        actionMode = startActionMode((android.view.ActionMode.Callback) Agriculture_system.this); //show ActionMode.
+                    }
+                }
+
+                multiSelect(position);
+            }
+        }));
+        ///////////////////////
 //        listView.setOnTouchListener(new View.OnTouchListener() {
 //            // Setting on Touch Listener for handling the touch inside ScrollView
 //            @Override
@@ -142,6 +184,14 @@ public class Agriculture_system extends AppCompatActivity {
                         break;
                     case 3:
                         state=4;
+                        getNumberOfChannel.setVisibility(View.INVISIBLE);
+//                        TextView textOfGetChannelNumber3= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
+//                        NoDefaultSpinner spinner3 = (NoDefaultSpinner) findViewById(R.id.spinnerOfGetChannelNumber);
+//                        getNumberOfChannel.setVisibility(View.VISIBLE);
+//                        textOfGetChannelNumber3.setVisibility(View.INVISIBLE);
+//                        spinner3.setVisibility(View.INVISIBLE);
+//                        //Button button1=(Button)findViewById(R.id.buttonofCallDevice);
+                       // button1.setVisibility(View.VISIBLE);
                         //setIntentToNextPage("configDevice");
                         break;
                     default:
@@ -192,6 +242,71 @@ public class Agriculture_system extends AppCompatActivity {
             }
         });
     }
+
+
+    private void multiSelect(int position) {
+        Operation data = adapter.getItem(position);
+        if (data != null){
+            if (actionMode != null) {
+                if (selectedIds.contains(data.getId()))
+                    selectedIds.remove(data.getId());
+                else
+                    selectedIds.add(data.getId());
+
+                if (selectedIds.size() > 0)
+                    actionMode.setTitle(String.valueOf(selectedIds.size())); //show selected item count on action mode.
+                else{
+                    actionMode.setTitle(""); //remove item count from action mode.
+                    actionMode.finish(); //hide action mode.
+                }
+                adapter.setSelectedIds(selectedIds);
+
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.list_context_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.menu_item_delete:
+                //just to show selected items.
+                int tmp=0;
+                int n=operations.size();
+                for (int i=0;i<n;i++) {
+                    if (selectedIds.contains(operations.get(i - tmp).getId())) {
+                        operations.remove(i - tmp);
+
+                        nameArray.remove(i - tmp);
+
+                        tmp++;
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                selectedIds.clear();
+                actionMode.finish();
+                //Toast.makeText(this, "Selected items are :" + stringBuilder.toString(), Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return false;
+    }
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        actionMode = null;
+        isMultiSelect = false;
+        selectedIds = new ArrayList<>();
+        adapter.setSelectedIds(new ArrayList<String>());
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -215,11 +330,20 @@ public class Agriculture_system extends AppCompatActivity {
 
             Operation tmp=(Operation) data.getSerializableExtra("operation");
             nameArray.add(tmp.getTitle());
-            tmp.setTitle(tmp.getTitle()+numberOfChannel);
+            if (state!=4) {
+                tmp.setTitle(tmp.getTitle() + numberOfChannel);
+            }
             operations.add(tmp);
             adapter.notifyDataSetChanged();
         }
     }
+
+
+
+
+    //////////////////////////
+
+
 
     /**** Method for Setting the Height of the ListView dynamically.
      **** Hack to fix the issue of not showing all the items of the ListView
@@ -344,12 +468,42 @@ public class Agriculture_system extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        callingWithDevice.unRegesteredSMS();
 
     }
     @Override
+    public void onStop() {
+        super.onStop();
+        callingWithDevice.unRegesteredSMS();
+        boolean result =operations.saveObject(operations,cacheDir,"Operation"+device.getUniqueID());
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
+
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
         callingWithDevice.setRegisteredSMS();
+        loadContent();
+    }
+    public void loadContent(){
+
+        MyArrayList<Operation> operationstmp = operations.getObject(getApplicationContext(),cacheDir,"Operation"+device.getUniqueID());
+
+        if(operationstmp!= null &&  (operations.size()==0 )) {
+            operations=operationstmp;
+            adapter.setOperations(operations);
+            //Toast.makeText(this, "Retrieved object", Toast.LENGTH_LONG).show();
+            for(int i=0;i<operations.size();i++){
+                nameArray.add(operations.get(i).getTitle());
+            }
+            adapter.notifyDataSetChanged();
+        }else {
+
+            //Toast.makeText(this, "Error retrieving object", Toast.LENGTH_LONG).show();
+
+        }
     }
 }

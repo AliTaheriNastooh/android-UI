@@ -1,6 +1,7 @@
 package com.sourcey.materiallogindemo;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Operation implements Serializable {
     private String title;
@@ -11,6 +12,7 @@ public class Operation implements Serializable {
     private String textOfImage;
     private Integer image;
     private String textForCallDevice;
+    private String uniqueID;
     public Operation(String _title,String _info,String _status,String _time,String _date,String _textOfCallDevice){
         title=_title;
         info=_info;
@@ -19,8 +21,11 @@ public class Operation implements Serializable {
         date=_date;
         textForCallDevice=_textOfCallDevice;
         setImage();
+        uniqueID= UUID.randomUUID().toString();
     }
-    public Operation(){}
+    public Operation(){
+        uniqueID= UUID.randomUUID().toString();
+    }
     public void setDetails(String _title,String _info,String _status,String _time,String _date,String _textOfCallDevice) {
         title = _title;
         info = _info;
@@ -76,5 +81,8 @@ public class Operation implements Serializable {
 
     public String getTextForCallDevice() {
         return textForCallDevice;
+    }
+    String getId(){
+        return uniqueID;
     }
 }

@@ -14,8 +14,8 @@ public class MyArrayList<E> extends ArrayList<E> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public boolean saveObject(MyArrayList obj,File cacheDir,String whicClass) {
-        if (whicClass.equals("Operation")) {
-            final File suspend_f = new File(cacheDir, "Operation");
+        if (whicClass.substring(0,6).equals("Operat")) {
+            final File suspend_f = new File(cacheDir, whicClass);
 
             FileOutputStream fos = null;
             ObjectOutputStream oos = null;
@@ -66,8 +66,8 @@ public class MyArrayList<E> extends ArrayList<E> implements Serializable {
 
     public MyArrayList getObject(Context c,File cacheDir,String whicClass) {
 
-        if (whicClass.equals("Operation")){
-            final File suspend_f=new File(cacheDir, "Operation");
+        if (whicClass.substring(0,6).equals("Operat")){
+            final File suspend_f=new File(cacheDir, whicClass);
             MyArrayList<Operation> simpleClass= null;
             FileInputStream fis = null;
             ObjectInputStream is = null;

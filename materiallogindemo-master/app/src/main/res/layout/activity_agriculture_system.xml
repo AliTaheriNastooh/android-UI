@@ -158,19 +158,19 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="20dp" />
 
-                    <Button
-                        android:id="@+id/buttonofCallDevice"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="24dp"
-                        android:layout_marginTop="24dp"
-                        android:background="@color/primary_darker"
-                        android:onClick="callButtonForNextState"
-                        android:padding="12dp"
-                        android:text="مرحله بعد" />
+
                 </LinearLayout>
 
-
+                <Button
+                    android:id="@+id/buttonofCallDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@color/primary_darker"
+                    android:onClick="callButtonForNextState"
+                    android:padding="12dp"
+                    android:text="مرحله بعد" />
             </LinearLayout>
 
 
@@ -187,7 +187,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="عملیات ها"
+                android:text="عملیات های اعمال نشده"
                 android:textColor="@color/primary" />
 
 
@@ -195,7 +195,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:background="@color/lightRed"
                 android:orientation="horizontal">
 
                 <android.support.v7.widget.RecyclerView
@@ -207,11 +206,14 @@
             </LinearLayout>
 
 
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textViewOfToogleButton"
@@ -232,6 +234,7 @@
                     android:textOn="SMS" />
 
             </LinearLayout>
+
             <Button
                 android:id="@+id/buttonofSetOperation"
                 android:layout_width="match_parent"
@@ -241,7 +244,7 @@
                 android:background="@color/primary_darker"
                 android:onClick="CallButtonForSetOperation"
                 android:padding="12dp"
-                android:text="اعمال تغییرات" />
+                android:text="اعمال همه تغییرات" />
 
         </LinearLayout>
 

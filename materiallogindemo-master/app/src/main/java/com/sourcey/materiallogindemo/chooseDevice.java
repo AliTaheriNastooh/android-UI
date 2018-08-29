@@ -390,6 +390,6 @@ public class chooseDevice extends AppCompatActivity
         editor.putString(MainActivity.PREF_REMEMBER, rememberValue);
         editor.commit();
         boolean result =devices.saveObject(devices,cacheDir,"Device");
-        boolean resultUser=user.saveObject(user,cacheDir);
+       // boolean resultUser=user.saveObject(user,cacheDir);
     }
 }

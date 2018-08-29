@@ -5,6 +5,8 @@
     android:baselineAligned="false"
     android:orientation="horizontal"
     android:paddingBottom="@dimen/list_item_article_space"
+    android:clickable="true"
+    android:id="@+id/root_view"
     android:paddingTop="@dimen/list_item_article_space">
 
     <LinearLayout

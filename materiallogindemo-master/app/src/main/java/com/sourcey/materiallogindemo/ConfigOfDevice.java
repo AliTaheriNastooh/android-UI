@@ -248,7 +248,7 @@ public class ConfigOfDevice extends Fragment {
                 if(day.getText().length()==2){
                     sDay=day.getText().toString();
                 }
-                String[] tmp3={"تنظیمات دستگاه" , "تنظیم تاریخ به: " +sDay+"/"+sMonth+"/"+sYear};
+                String[] tmp3={"تنظیمات دستگاه" , "تنظیم تاریخ به: " +sYear+"/"+sMonth+"/"+sDay};
                 return tmp3;
             case R.id.radioButtonOfsetTime:
 
@@ -268,7 +268,7 @@ public class ConfigOfDevice extends Fragment {
                 if(hour.getText().length()==2){
                     shour=hour.getText().toString();
                 }
-                String[] tmp4={"تنظیمات دستگاه" , "تنظیم زمان به: " +minute+":"+shour};
+                String[] tmp4={"تنظیمات دستگاه" , "تنظیم زمان به: " +shour+":"+sminute};
                 return tmp4;
             default:
                 return tmp;
