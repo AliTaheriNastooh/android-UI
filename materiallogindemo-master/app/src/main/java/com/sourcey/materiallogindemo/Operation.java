@@ -43,11 +43,11 @@ public class Operation implements Serializable {
             textOfImage="انتظار";
             image=R.drawable.pending;
         }
-        if(status.equals("success")){
+        if(status.equals("complete")){
             textOfImage= "موفق";
             image=R.drawable.success;
         }
-        if(status.equals("unsuccess")){
+        if(status.equals("notcomplete")){
             textOfImage="ناموفق";
             image=R.drawable.unsuccess;
         }

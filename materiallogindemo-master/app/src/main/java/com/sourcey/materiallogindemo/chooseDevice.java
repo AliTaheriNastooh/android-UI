@@ -47,7 +47,6 @@ public class chooseDevice extends AppCompatActivity
     int counter=1;
     int request_code=1;
     int requset_code_agriculture=2;
-    boolean flagUser=false;
     CustomListAdapter whatever;
     ArrayList<String> nameArray=new ArrayList<String>();
     MyArrayList<Device> devices=new MyArrayList<Device>();
@@ -67,12 +66,6 @@ public class chooseDevice extends AppCompatActivity
             cacheDir.mkdirs();
 
         user=(User)getIntent().getSerializableExtra(LoginActivity.TAG);
-        if(user==null){
-            flagUser=false;
-        }
-        else{
-            flagUser=true;
-        }
         whatever = new CustomListAdapter(this, nameArray, devices);
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(whatever);
@@ -247,35 +240,14 @@ public class chooseDevice extends AppCompatActivity
             super.onBackPressed();
         }
     }
-    public User getObject(Context c, File cacheDir) {
-        final File suspend_f=new File(cacheDir, "user");
-
-        User simpleClass= null;
-        FileInputStream fis = null;
-        ObjectInputStream is = null;
-
-        try {
-            fis = new FileInputStream(suspend_f);
-            is = new ObjectInputStream(fis);
-            simpleClass = (User) is.readObject();
-        } catch(Exception e) {
-            String val= e.getMessage();
-        } finally {
-            try {
-                if (fis != null)   fis.close();
-                if (is != null)   is.close();
-            } catch (Exception e) { }
-        }
-
-        return simpleClass;
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         this.menu=menu;
-        if(!flagUser) {
-            user = getObject(getApplicationContext(), cacheDir);
+        if(user==null) {
+            User usertmp=new User();
+            user=usertmp.getObject(getApplicationContext(), cacheDir);
         }
         if (user.getRememberMe().equals("true")) {
             menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.lock_open));
@@ -320,6 +292,7 @@ public class chooseDevice extends AppCompatActivity
         super.onResume();
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -333,6 +306,11 @@ public class chooseDevice extends AppCompatActivity
             mdrawer.openDrawer(GravityCompat.START);
 
         } else if (id == R.id.nav_history) {
+            Intent i = new Intent(getApplicationContext(), showLog.class);
+            ActivityOptions options =
+                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
+            //  startActivity(i, options.toBundle());
+            startActivity(i);
             mdrawer.openDrawer(GravityCompat.START);
 
         } else if (id == R.id.nav_setting) {
@@ -390,6 +368,6 @@ public class chooseDevice extends AppCompatActivity
         editor.putString(MainActivity.PREF_REMEMBER, rememberValue);
         editor.commit();
         boolean result =devices.saveObject(devices,cacheDir,"Device");
-       // boolean resultUser=user.saveObject(user,cacheDir);
+       boolean resultUser=user.saveObject(user,cacheDir);
     }
 }

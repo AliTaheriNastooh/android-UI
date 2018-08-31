@@ -26,7 +26,6 @@ public class GetDetails extends AppCompatActivity {
     String lastFragment="";
     String newFragment="";
     int a=0;
-    CallingWithDevice callingWithDevice;
     Fragment fragment;
     private Device device;
     private Switch simpleSwitch;
@@ -57,7 +56,7 @@ public class GetDetails extends AppCompatActivity {
         deviceAddress.setText( "آدرس دستگاه: " +device.getAddress());
         changeFragment(newFragment);
         dtmf_decode=new StartDTMF_Decode(this);
-        callingWithDevice=new CallingWithDevice(this,"getDetails",device.getPhoneNumber());
+       // callingWithDevice=new CallingWithDevice(this,"getDetails",device.getPhoneNumber());
     }
     ////////////////////
     public void set_NewFragment(String set){
@@ -212,7 +211,7 @@ public class GetDetails extends AppCompatActivity {
                 return;
             }else {
 
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(), ("1#" + numberOfChannel + "#" +getedString)  );
             }
         }
         if (newFragment.equals("Channelon")) {
@@ -222,7 +221,7 @@ public class GetDetails extends AppCompatActivity {
             if (getedString.equals("error")) {
                 return;
             }else {
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),("1#" + numberOfChannel + "#" +getedString) );
             }
 
         }
@@ -246,7 +245,7 @@ public class GetDetails extends AppCompatActivity {
             if (getedString.equals("error")) {
                 return;
             } else {
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),getedString);
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),("3#" +getedString) );
 
             }
 
@@ -319,7 +318,7 @@ public class GetDetails extends AppCompatActivity {
 
         }
         sentMassage=massages;
-        callingWithDevice.connectWithDevice(simpleSwitch.isChecked(),massages);
+        //callingWithDevice.connectWithDevice(simpleSwitch.isChecked(),massages);
     }
     //////////////////////////////////////////////
 
@@ -365,7 +364,7 @@ public class GetDetails extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        callingWithDevice.unRegesteredSMS();
+        //callingWithDevice.unRegesteredSMS();
         FragmentManager fm = getSupportFragmentManager();
         for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
@@ -378,6 +377,6 @@ public class GetDetails extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        callingWithDevice.setRegisteredSMS();
+       // callingWithDevice.setRegisteredSMS();
     }
 }

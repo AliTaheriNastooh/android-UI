@@ -28,9 +28,9 @@ public class channelOn extends Fragment {
         RadioGroup rGroup = (RadioGroup)getActivity().findViewById(R.id.radioGroupOfChannelOn);
         switch (rGroup.getCheckedRadioButtonId()){
             case R.id.radioButtonOfDeleteProject:
-                return "2#";
+                return "1#"+"2#";
             case R.id.radioButtonOfCloseChannel:
-                return "1#";
+                return "1#"+"1#";
 
             default:
                 return "error";

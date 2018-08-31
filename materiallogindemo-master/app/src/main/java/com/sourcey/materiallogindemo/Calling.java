@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -123,8 +124,14 @@ public class Calling extends Activity {
                     Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                     Log.i(TAG, message);
                     returningFromOffHook = true;
+                    AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setMode(AudioManager.MODE_IN_CALL);
+                    audioManager.setSpeakerphoneOn(true);
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
+                    AudioManager audioManager1 = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+                    audioManager1.setSpeakerphoneOn(false);
+                    audioManager1.setMode(AudioManager.MODE_NORMAL);
                     message = message + mContext.getString(R.string.idle);
                     Toast.makeText(mContext.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                     Log.i(TAG, message);

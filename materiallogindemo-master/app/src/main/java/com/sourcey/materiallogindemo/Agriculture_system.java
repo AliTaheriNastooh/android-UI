@@ -389,20 +389,29 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     //////////////////////////
 
     public void callButtonForNextState(View view){
-        goToNextPage(" ");
+        goToNextPage("  ");
     }
 
     /////////////////////////
     public void CallButtonForSetOperation(View view){
-
+        simpleSwitch.setClickable(false);
         String setMessage="";
-        setMessage=state+"#"+numberOfChannel;
+        for (int i=0;i<operations.size();i++){
+            setMessage+=(operations.get(i).getTextForCallDevice()+"\n");
+
+        }
         callingWithDevice.connectWithDevice(simpleSwitch.isChecked(),setMessage);
     }
 
-    public void getRecievedSMSMassage(String recievedMassage){
-        if(recievedMassage.equals("0")||recievedMassage.equals("1") ){
-            goToNextPage(recievedMassage);
+    public void getResultOfCalling(String recievedMassage){
+        if(recievedMassage.equals("complete")||recievedMassage.equals("notcomplete") ){
+            saveOperationInLog(recievedMassage);
+            if(recievedMassage.equals("notcomplete")){
+                setIntentToNextPage("showOperationWrong");
+            }
+            if(recievedMassage.equals("complete")){
+                setIntentToNextPage("showOperationCorrect");
+            }
         }else{
             Toast.makeText(getApplicationContext(),"wrong message",Toast.LENGTH_SHORT).show();
         }
@@ -468,24 +477,24 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     @Override
     public void onPause() {
         super.onPause();
-
+        callingWithDevice.unRegesteredSMS();
     }
     @Override
     public void onStop() {
         super.onStop();
-        callingWithDevice.unRegesteredSMS();
+
         boolean result =operations.saveObject(operations,cacheDir,"Operation"+device.getUniqueID());
     }
 
     @Override
     public void onResume(){
         super.onResume();
-
+        callingWithDevice.setRegisteredSMS();
     }
     @Override
     public void onStart(){
         super.onStart();
-        callingWithDevice.setRegisteredSMS();
+
         loadContent();
     }
     public void loadContent(){
@@ -504,6 +513,26 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 
             //Toast.makeText(this, "Error retrieving object", Toast.LENGTH_LONG).show();
 
+        }
+    }
+    public void saveOperationInLog(String operationStatus){
+        MyArrayList<Operation> operationstmp = operations.getObject(getApplicationContext(),cacheDir,"OperationLog");
+        if (operationstmp!=null){
+            for (int i=0;i<operations.size();i++){
+                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+                operationstmp.add(operations.get(i));
+            }
+            operationstmp.saveObject(operationstmp,cacheDir,"OperationLog");
+        }else{
+            for (int i=0;i<operations.size();i++){
+                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+            }
+            boolean result =operations.saveObject(operations,cacheDir,"OperationLog");
+        }
+        if (operationStatus.equals("complete")){
+            operations.clear();
+            nameArray.clear();
+            adapter.notifyDataSetChanged();
         }
     }
 }

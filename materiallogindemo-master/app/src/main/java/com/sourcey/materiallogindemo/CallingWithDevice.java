@@ -22,6 +22,7 @@ public class CallingWithDevice {
     private String lastMessageSend;
     private StartDTMF_Decode dtmf_decode;
     boolean isRegistered = false;
+    boolean which_Call_SMS=true;
     public static final String SMS_RECEIVED_ACTION =
             "android.provider.Telephony.SMS_RECEIVED";
     SMS_Receiver mSMS_Receiver;
@@ -65,21 +66,17 @@ public class CallingWithDevice {
         }
     }
     public void setRecievedSMS(String phoneNumberOfSMS,String messageOfSMS){
+        if (phoneNumberOfSMS.length()<11)return;
         String parseGetPhoneNumber=phoneNumberOfSMS.substring(5);
         String parsePhoneNumber=phoneNumber.substring(3);
 
         if(parsePhoneNumber.equals(parseGetPhoneNumber)){
-            if (callerClass.equals("agricultureSystem")){
-                ((Agriculture_system)mContext).getRecievedSMSMassage(messageOfSMS);
-            }else{
-                if (callerClass.equals("getDetails")){
-                    ((GetDetails)mContext).getRecievedSMSMassage(messageOfSMS);
-                }
-            }
+            checkResultOfCalling(messageOfSMS);
         }
 
     }
     public void connectWithDevice(boolean call_SMS,String sendMessage){
+        which_Call_SMS=call_SMS;
         String convertedMessage=convertMessage(call_SMS,sendMessage);
         if(call_SMS){
             mySender_sms.smsSendMessage(phoneNumber,convertedMessage);
@@ -107,13 +104,15 @@ public class CallingWithDevice {
                     newMessage=newMessage+",";
                     flag=false;
                 }else{
-                    if (flag){
-                        newMessage=newMessage+","+lastMessage.charAt(i);
-                        flag=false;
-                    }else{
-                        newMessage=newMessage+lastMessage.charAt(i);
-                        flag=true;
+                    if (lastMessage.charAt(i) != '\n') {
+                        if (flag) {
+                            newMessage = newMessage + "," + lastMessage.charAt(i);
+                            flag = true;
+                        } else {
+                            newMessage = newMessage + lastMessage.charAt(i);
+                            flag = true;
 
+                        }
                     }
                     //setMessage=setMessage+massages.charAt(i);
                 }
@@ -124,35 +123,59 @@ public class CallingWithDevice {
 
     }
 
+    public void checkResultOfCalling(String getMassage){
+        if (which_Call_SMS){
+            if(getMassage.equals("0")){
+                ((Agriculture_system)mContext).getResultOfCalling("notcomplete");
+            }
+            if(getMassage.equals("1")){
+                ((Agriculture_system)mContext).getResultOfCalling("complete");
+            }
+        }else{
+            if (getMassage.substring(getMassage.length()-2).equals("##")){
+                ((Agriculture_system)mContext).getResultOfCalling("complete");
+            }else{
+                ((Agriculture_system)mContext).getResultOfCalling("notcomplete");
+            }
 
+        }
+//        if (callerClass.equals("agricultureSystem")){
+//            ((Agriculture_system)mContext).getRecievedSMSMassage(messageOfSMS);
+//        }else{
+//            if (callerClass.equals("getDetails")){
+//                ((GetDetails)mContext).getRecievedSMSMassage(messageOfSMS);
+//            }
+//        }
+    }
     public void getRecognizeDTMF(){
         String recognizeText=dtmf_decode.getRecognizeredText();
         Toast.makeText(mContext,"text"+ dtmf_decode.getRecognizeredText(),Toast.LENGTH_SHORT).show();
         Log.i("recognize Text----:", recognizeText);
         dtmf_decode.stopDecode();
-        String correctText="";
-        for(int i=0;i<lastMessageSend.length();i++){
-            if (lastMessageSend.charAt(i) == ',') {
-
-            }else{
-                correctText+=lastMessageSend.charAt(i);
-            }
-        }
-        boolean flag=false;
-        if(recognizeText.length()<=correctText.length()){
-            return;
-        }
-        for(int i=0;i<correctText.length();i++){
-            if(correctText.charAt(i)==recognizeText.charAt((i))){
-                flag=true;
-            }else{
-                flag=false;
-            }
-        }
-        if(flag){
-            String tmp=""+(recognizeText.charAt(correctText.length()));
-            //goToNextPage(tmp);
-        }
+        checkResultOfCalling(recognizeText);
+//        String correctText="";
+//        for(int i=0;i<lastMessageSend.length();i++){
+//            if (lastMessageSend.charAt(i) == ',') {
+//
+//            }else{
+//                correctText+=lastMessageSend.charAt(i);
+//            }
+//        }
+//        boolean flag=false;
+//        if(recognizeText.length()<=correctText.length()){
+//            return;
+//        }
+//        for(int i=0;i<correctText.length();i++){
+//            if(correctText.charAt(i)==recognizeText.charAt((i))){
+//                flag=true;
+//            }else{
+//                flag=false;
+//            }
+//        }
+//        if(flag){
+//            String tmp=""+(recognizeText.charAt(correctText.length()));
+//            //goToNextPage(tmp);
+//        }
     }
     public  void startRecord(){
         dtmf_decode.startDecode();

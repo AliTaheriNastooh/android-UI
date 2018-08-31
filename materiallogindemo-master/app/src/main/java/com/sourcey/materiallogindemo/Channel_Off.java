@@ -125,20 +125,20 @@ public class Channel_Off extends Fragment {
         switch (rGroup.getCheckedRadioButtonId()){
             case R.id.radioButtonOfOpenImmediate:
                 EditText timeOfOpen = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
-                return "1#"+timeOfOpen.getText()+"*";
+                return "0#"+"1#"+timeOfOpen.getText()+"*";
             case R.id.radioButtonOfOpenWithDelay:
                 EditText startTimeToOpneInHour = (EditText)getActivity().findViewById(R.id.editTextOfstartOpenInHour);
                 EditText startTimeToOpneInMinute = (EditText)getActivity().findViewById(R.id.editTextOfStartToOpenInMinute);
                 EditText timeOfOpen2 = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
-                return "2#"+startTimeToOpneInHour.getText()+"*"+startTimeToOpneInMinute.getText()+"*"+timeOfOpen2.getText()+"*";
+                return "0#"+"2#"+startTimeToOpneInHour.getText()+"*"+startTimeToOpneInMinute.getText()+"*"+timeOfOpen2.getText()+"*";
             case R.id.radioButtonOfPeriodicProgram:
                 EditText startTimeToOpneInHour3 = (EditText)getActivity().findViewById(R.id.editTextOfstartOpenInHour);
                 EditText startTimeToOpneInMinute3 = (EditText)getActivity().findViewById(R.id.editTextOfStartToOpenInMinute);
                 EditText timeOfOpen3 = (EditText)getActivity().findViewById(R.id.editTextOfOpenTime);
                 EditText periodicTime3 = (EditText)getActivity().findViewById(R.id.editTextOfPeriodicTime);
-                return "3#"+periodicTime3.getText()+"*"+startTimeToOpneInHour3.getText()+"*"+startTimeToOpneInMinute3.getText()+"*"+timeOfOpen3.getText()+"*";
+                return "0#"+"3#"+periodicTime3.getText()+"*"+startTimeToOpneInHour3.getText()+"*"+startTimeToOpneInMinute3.getText()+"*"+timeOfOpen3.getText()+"*";
             case R.id.radioButtonOfDeleteOrder:
-                return "4#";
+                return "0#"+"4#";
             default:
                 return "error";
         }
