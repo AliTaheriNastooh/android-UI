@@ -11,6 +11,10 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
+
 import static android.app.Activity.RESULT_OK;
 
 public class CallingWithDevice {
@@ -21,6 +25,7 @@ public class CallingWithDevice {
     private Calling getCall;
     private String lastMessageSend;
     private StartDTMF_Decode dtmf_decode;
+    private String smsId;
     boolean isRegistered = false;
     boolean which_Call_SMS=true;
     public static final String SMS_RECEIVED_ACTION =
@@ -37,20 +42,7 @@ public class CallingWithDevice {
         IntentFilter filter = new IntentFilter(SMS_RECEIVED_ACTION);
         mContext.registerReceiver(mSMS_Receiver, filter);
         isRegistered=true;
-        final OnNewSMSListener onNewLocationListener = new OnNewSMSListener() {
-            @Override
-            public void onNewSMSReceived(String phoneNumberRecieved,String messageRecieved) {
-                // do something
-                setRecievedSMS(phoneNumberRecieved,messageRecieved);
-                // then stop listening
-                //Toast.makeText(mContext,"now now"+in[0]+" : "+in[1],Toast.LENGTH_SHORT).show();
-                SMS_Receiver.clearOnNewLocationListener(this);
-            }
-        };
-
-        // start listening for new location
-        SMS_Receiver.setOnNewLocationListener(
-                onNewLocationListener);
+        setNewListener();
     }
     public void setRegisteredSMS(){
         if (!isRegistered){
@@ -65,8 +57,23 @@ public class CallingWithDevice {
             isRegistered=false;
         }
     }
+    public void setNewListener(){
+        OnNewSMSListener onNewLocationListener = new OnNewSMSListener() {
+            @Override
+            public void onNewSMSReceived(String phoneNumberRecieved,String messageRecieved) {
+                // do something
+                setRecievedSMS(phoneNumberRecieved,messageRecieved);
+                // then stop listening
+                //Toast.makeText(mContext,"now now"+in[0]+" : "+in[1],Toast.LENGTH_SHORT).show();
+                SMS_Receiver.clearOnNewLocationListener(this);
+            }
+        };
+        SMS_Receiver.setOnNewLocationListener(
+                onNewLocationListener);
+    }
     public void setRecievedSMS(String phoneNumberOfSMS,String messageOfSMS){
         if (phoneNumberOfSMS.length()<11)return;
+        setNewListener();
         String parseGetPhoneNumber=phoneNumberOfSMS.substring(5);
         String parsePhoneNumber=phoneNumber.substring(3);
 
@@ -79,7 +86,8 @@ public class CallingWithDevice {
         which_Call_SMS=call_SMS;
         String convertedMessage=convertMessage(call_SMS,sendMessage);
         if(call_SMS){
-            mySender_sms.smsSendMessage(phoneNumber,convertedMessage);
+            smsId=getDate()+getTime()+getFourRandromChar();
+            mySender_sms.smsSendMessage(phoneNumber,smsId+"\n"+convertedMessage);
         }else{
             getCall.setCall(phoneNumber+convertedMessage);
         }
@@ -125,12 +133,15 @@ public class CallingWithDevice {
 
     public void checkResultOfCalling(String getMassage){
         if (which_Call_SMS){
-            if(getMassage.equals("0")){
-                ((Agriculture_system)mContext).getResultOfCalling("notcomplete");
+            if (getMassage.substring(0,14).equals(smsId)){
+                ((Agriculture_system)mContext).getResultOfSMS(getMassage.substring(15));
             }
-            if(getMassage.equals("1")){
-                ((Agriculture_system)mContext).getResultOfCalling("complete");
-            }
+//            if(getMassage.equals("0")){
+//                ((Agriculture_system)mContext).getResultOfCalling("notcomplete");
+//            }
+//            if(getMassage.equals("1")){
+//                ((Agriculture_system)mContext).getResultOfCalling("complete");
+//            }
         }else{
             if (getMassage.substring(getMassage.length()-2).equals("##")){
                 ((Agriculture_system)mContext).getResultOfCalling("complete");
@@ -186,8 +197,66 @@ public class CallingWithDevice {
     }
     //////////////////////////
 
+    public String getTime(){
+        Date currentTime = Calendar.getInstance().getTime();
+        String sminute="";
+        String shour="";
+        if(Integer.toString(currentTime.getHours()).length()==1 ){
+            sminute="0"+Integer.toString(currentTime.getHours()).charAt(0);
+        }
+        if(Integer.toString(currentTime.getHours()).length()==2){
+            sminute=Integer.toString(currentTime.getHours());
+        }
+        if(Integer.toString(currentTime.getMinutes()).length()==1 ){
+            shour="0"+Integer.toString(currentTime.getMinutes()).charAt(0);
+        }
+        if(Integer.toString(currentTime.getMinutes()).length()==2){
+            shour=Integer.toString(currentTime.getMinutes());
+        }
+        return shour+sminute;
+    }
+    public String  getDate(){
+        Calendar cal= Calendar.getInstance();
+        int yearm=cal.get(Calendar.YEAR);
+        int monthm=cal.get(Calendar.MONTH)+1;
+        int daym=cal.get(Calendar.DAY_OF_MONTH);
 
+        JalaliCalendar.gDate miladiCal=new JalaliCalendar.gDate(yearm,monthm,daym);
+        JalaliCalendar.gDate jalaliCal= JalaliCalendar.MiladiToJalali(miladiCal);
+        String sYear="";
+        String sMonth="";
+        String sDay="";
 
+        if(Integer.toString(jalaliCal.getYear()).length()==4){
+            sYear=Integer.toString(jalaliCal.getYear()).substring(2);
+        }
+        if(Integer.toString(jalaliCal.getYear()).length()==2){
+            sYear=Integer.toString(jalaliCal.getYear());
+        }
+        if(Integer.toString(jalaliCal.getMonth()).length()==1 ){
+            sMonth="0"+Integer.toString(jalaliCal.getMonth()).charAt(0);
+        }
+        if(Integer.toString(jalaliCal.getMonth()).length()==2){
+            sMonth=Integer.toString(jalaliCal.getMonth());
+        }
+        if(Integer.toString(jalaliCal.getDay()).length()==1 ){
+            sDay="0"+Integer.toString(jalaliCal.getDay()).charAt(0);
+        }
+        if(Integer.toString(jalaliCal.getDay()).length()==2){
+            sDay=Integer.toString(jalaliCal.getDay());
+        }
+        return sYear+sMonth+sDay;
+    }
 
+    public String getFourRandromChar(){
+        String randomS="";
+        Random r=new Random();
+        randomS+=(char)(r.nextInt(26)+'A');
+        randomS+=(char)(r.nextInt(26)+'A');
+        randomS+=(char)(r.nextInt(26)+'A');
+        randomS+=(char)(r.nextInt(26)+'A');
+       // randomS+=((char)(r.nextInt(26)+'A')+(char)(r.nextInt(26)+'A')+(char)(r.nextInt(26)+'A')+(char)(r.nextInt(26)+'A'));
+        return randomS;
+    }
     //////////////////////////
 }

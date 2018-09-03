@@ -89,6 +89,7 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
         positionIntent= (int) intent.getSerializableExtra("positionDevice");
         TextView phoneNumber=(TextView)findViewById(R.id.devicePhoneNumber);
         TextView address=(TextView)findViewById(R.id.deviceAdress);
+
         phoneNumber.setText("شماره تماس دستگاه: " +device.getPhoneNumber());
         address.setText( "آدرس دستگاه: " +device.getAddress());
         final Toolbar toolbar = findViewById(R.id.toolbar2);
@@ -405,7 +406,11 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 
     public void getResultOfCalling(String recievedMassage){
         if(recievedMassage.equals("complete")||recievedMassage.equals("notcomplete") ){
-            saveOperationInLog(recievedMassage);
+            for (int i=0;i<operations.size();i++){
+
+                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),recievedMassage,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+            }
+            saveOperationInLog();
             if(recievedMassage.equals("notcomplete")){
                 setIntentToNextPage("showOperationWrong");
             }
@@ -416,7 +421,31 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
             Toast.makeText(getApplicationContext(),"wrong message",Toast.LENGTH_SHORT).show();
         }
     }
+    public void getResultOfSMS(String recievedMassage){
+        if(recievedMassage.length()==(2*operations.size())-1){
+            int counter=0;
+            boolean flag=true;
+            for (int i=0;i<recievedMassage.length();i++){
+                if (recievedMassage.charAt(i)!='\n'){
+                    if (recievedMassage.charAt(i)=='1'){
+                        operations.get(counter).setDetails(operations.get(counter).getTitle(),operations.get(counter).getInfo(),"complete",operations.get(counter).getTime(),operations.get(counter).getDate(),operations.get(counter).getTextForCallDevice());
+                    }
+                    if (recievedMassage.charAt(i )=='0'){
+                         operations.get(counter).setDetails(operations.get(counter).getTitle(),operations.get(counter).getInfo(),"notcomplete",operations.get(counter).getTime(),operations.get(counter).getDate(),operations.get(counter).getTextForCallDevice());
+                        flag=false;
+                    }
+                counter++;
+                }
+            }
 
+            saveOperationInLog();
+            if(flag==false){
+                setIntentToNextPage("showOperationWrong");
+            }else{
+                setIntentToNextPage("showOperationCorrect");
+            }
+        }
+    }
     public void setIntentToNextPage(String sMessage){
         Intent intent1 = new Intent(this, GetDetails.class);
         String message = sMessage;
@@ -436,7 +465,7 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
                 break;
 
             case 3:
-                ///
+
                 break;
 
             case 4:
@@ -515,24 +544,26 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 
         }
     }
-    public void saveOperationInLog(String operationStatus){
+    public void saveOperationInLog(){
         MyArrayList<Operation> operationstmp = operations.getObject(getApplicationContext(),cacheDir,"OperationLog");
         if (operationstmp!=null){
-            for (int i=0;i<operations.size();i++){
-                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
-                operationstmp.add(operations.get(i));
-            }
+            //operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+            operationstmp.addAll(operations);
             operationstmp.saveObject(operationstmp,cacheDir,"OperationLog");
         }else{
-            for (int i=0;i<operations.size();i++){
-                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
-            }
+//            for (int i=0;i<operations.size();i++){
+//                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+//            }
             boolean result =operations.saveObject(operations,cacheDir,"OperationLog");
         }
-        if (operationStatus.equals("complete")){
-            operations.clear();
-            nameArray.clear();
-            adapter.notifyDataSetChanged();
+        int tm=0;
+        for (int i=0;i<operations.size()+tm;i++) {
+            if (operations.get(i-tm).getStatus().equals("complete")) {
+                operations.remove(i-tm);
+                nameArray.remove(i-tm);
+                tm++;
+            }
         }
+        adapter.notifyDataSetChanged();
     }
 }
