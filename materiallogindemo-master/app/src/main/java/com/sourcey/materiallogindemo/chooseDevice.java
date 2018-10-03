@@ -322,6 +322,22 @@ public class chooseDevice extends AppCompatActivity
         } else if (id == R.id.nav_connenctWithUs) {
             mdrawer.openDrawer(GravityCompat.START);
 
+        } else if (id == R.id.nav_reminder) {
+            Intent i = new Intent(getApplicationContext(), ShowReminder.class);
+            ActivityOptions options =
+                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
+            //  startActivity(i, options.toBundle());
+            startActivity(i);
+            mdrawer.openDrawer(GravityCompat.START);
+
+        }else if (id == R.id.nav_template) {
+            Intent i = new Intent(getApplicationContext(), ShowTemplateSetting.class);
+            ActivityOptions options =
+                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.push_left_in, R.anim.push_left_out);
+            //  startActivity(i, options.toBundle());
+            startActivity(i);
+            mdrawer.openDrawer(GravityCompat.START);
+
         }
 
         mdrawer.closeDrawer(GravityCompat.START);

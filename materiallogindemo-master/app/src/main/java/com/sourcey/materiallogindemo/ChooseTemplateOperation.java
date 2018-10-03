@@ -4,59 +4,39 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ChooseTemplateOperation.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ChooseTemplateOperation#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ChooseTemplateOperation extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private LinearLayout getNumberOfChannel;
+    public   int state=-1;
+    public  String numberOfChannel;
+    private Context mcontext;
 
-    private OnFragmentInteractionListener mListener;
+    View view;
+
 
     public ChooseTemplateOperation() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChooseTemplateOperation.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ChooseTemplateOperation newInstance(String param1, String param2) {
-        ChooseTemplateOperation fragment = new ChooseTemplateOperation();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
@@ -64,32 +44,86 @@ public class ChooseTemplateOperation extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_choose_template_operation, container, false);
+         view=inflater.inflate(R.layout.fragment_choose_template_operation, container, false);
+        getNumberOfChannel=(LinearLayout)view.findViewById(R.id.layoutOfGetChannelNumber);
+        getNumberOfChannel.setVisibility(View.INVISIBLE);
+        NoDefaultSpinner spinner = (NoDefaultSpinner) view.findViewById(R.id.spinnerOfActivity);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.Activity_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter,"فرآیند را انتخاب کنید");
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            public void onItemSelected(AdapterView<?> parent, View view1,
+                                       int position, long id) {
+
+                switch(position){
+                    case 0:
+                        TextView textOfGetChannelNumber= (TextView) view.findViewById(R.id.textViewOfGetChannelNumber);
+                        state=1;
+                        textOfGetChannelNumber.setText("شماره کانال مورد نظر برای روشن کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
+                        getNumberOfChannel.setVisibility(View.VISIBLE);
+                        break;
+                    case 1:
+                        TextView textOfGetChannelNumber1= (TextView) view.findViewById(R.id.textViewOfGetChannelNumber);
+                        state=2;
+                        textOfGetChannelNumber1.setText("شماره کانال مورد نظر برای خاموش کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
+                        getNumberOfChannel.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        TextView textOfGetChannelNumber2= (TextView) view.findViewById(R.id.textViewOfGetChannelNumber);
+                        state=3;
+                        textOfGetChannelNumber2.setText("شماره کانال مورد نظر برای دریافت گزارش را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
+                        getNumberOfChannel.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        state=4;
+                        getNumberOfChannel.setVisibility(View.INVISIBLE);
+//                        TextView textOfGetChannelNumber3= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
+//                        NoDefaultSpinner spinner3 = (NoDefaultSpinner) findViewById(R.id.spinnerOfGetChannelNumber);
+//                        getNumberOfChannel.setVisibility(View.VISIBLE);
+//                        textOfGetChannelNumber3.setVisibility(View.INVISIBLE);
+//                        spinner3.setVisibility(View.INVISIBLE);
+//                        //Button button1=(Button)findViewById(R.id.buttonofCallDevice);
+                        // button1.setVisibility(View.VISIBLE);
+                        //setIntentToNextPage("configDevice");
+                        break;
+                    default:
+
+                }
+
+             //   Log.v("item........... :", (String) parent.getItemAtPosition(position)+"  switch : "+ simpleSwitch.isChecked());
+            }
+
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.v("item........... :", "nothing Selected");
+                // TODO Auto-generated method stub
+            }
+        });
+        NoDefaultSpinner spinner2 = (NoDefaultSpinner) view.findViewById(R.id.spinnerOfGetChannelNumber);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getActivity(),
+                R.array.channelNumber_array, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner2.setAdapter(adapter2,"کانال را انتخاب کنید:");
+        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                numberOfChannel=String.valueOf(position+1);
+            }
+
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                numberOfChannel=String.valueOf(-1);
+            }
+        });
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -101,8 +135,11 @@ public class ChooseTemplateOperation extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+
+    public int getState(){
+        return state;
+    }
+    public String getNumberOfChannel(){
+        return numberOfChannel;
     }
 }

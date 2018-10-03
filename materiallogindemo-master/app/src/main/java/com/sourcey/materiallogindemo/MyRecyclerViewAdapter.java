@@ -26,17 +26,29 @@ import java.util.List;
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
     private final Activity context;
     private MyArrayList<Operation> operations;
+    private MyArrayList<ReminderTemplate> reminders;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private List<String> selectedIds = new ArrayList<>();
+    private String whichClass;
     // data is passed into the constructor
     MyRecyclerViewAdapter(Context context, MyArrayList<Operation> data) {
         this.mInflater = LayoutInflater.from(context);
         this.operations = data;
         this.context= (Activity) context;
+        whichClass="operations";
+    }
+    MyRecyclerViewAdapter(Context context, MyArrayList<ReminderTemplate> data,boolean empty) {
+        this.mInflater = LayoutInflater.from(context);
+        this.reminders = data;
+        this.context= (Activity) context;
+        whichClass="reminders";
     }
     public void setOperations(MyArrayList<Operation> _operation){
         operations=_operation;
+    }
+    public void setReminders(MyArrayList<ReminderTemplate> _reminders){
+        reminders=_reminders;
     }
     // inflates the row layout from xml when needed
     @Override
@@ -49,44 +61,75 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.titleTextField.setText(operations.get(position).getTitle());
-        holder.infoTextField.setText(operations.get(position).getInfo());
-        String concatinate= "زمان: " + operations.get(position).getTime()+"     " +"تاریخ:  "+operations.get(position).getDate();
-        holder.dateAndTimeTextField.setText(concatinate);
-        holder. statusTextField.setText(operations.get(position).getTextOfImage());
-        Glide.with(context).load(operations.get(position).getImage()).asBitmap().fitCenter().into(new BitmapImageViewTarget(holder.img) {
-            @Override
-            protected void setResource(Bitmap resource) {
-                RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                circularBitmapDrawable.setCircular(true);
-                holder.img.setImageDrawable(circularBitmapDrawable);
+        if(whichClass.equals("operations")) {
+            holder.titleTextField.setText(operations.get(position).getTitle());
+            holder.infoTextField.setText(operations.get(position).getInfo());
+            String concatinate = "زمان: " + operations.get(position).getTime() + "     " + "تاریخ:  " + operations.get(position).getDate();
+            holder.dateAndTimeTextField.setText(concatinate);
+            holder.statusTextField.setText(operations.get(position).getTextOfImage());
+            Glide.with(context).load(operations.get(position).getImage()).asBitmap().fitCenter().into(new BitmapImageViewTarget(holder.img) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                    circularBitmapDrawable.setCircular(true);
+                    holder.img.setImageDrawable(circularBitmapDrawable);
+                }
+            });
+
+
+            String id = operations.get(position).getId();
+
+            if (selectedIds.contains(id)) {
+                //if item is selected then,set foreground color of FrameLayout.
+                holder.rootView.setBackgroundResource(R.color.colorActionMode);
+            } else {
+                //else remove selected item color.
+                holder.rootView.setBackgroundResource(android.R.color.transparent);
             }
-        });
+        }else{
+            holder.titleTextField.setText(" یادآوری در دستگاه "+reminders.get(position).getDevice().getName());
+            holder.infoTextField.setText(" مربوط به قالب "+reminders.get(position).getTemplate().getName()+" "+" تکرار " +reminders.get(position).getPersianOfPeriod() );
+            String concatinate = "زمان یادآوری: " +reminders.get(position).getHourOfWakeUp()  + ":" +reminders.get(position).getMinuteOfWakeUp()  ;
+            holder.dateAndTimeTextField.setText(concatinate);
+            holder.statusTextField.setText("یادآوری");
+            Glide.with(context).load(R.drawable.ic_reminder).asBitmap().fitCenter().into(new BitmapImageViewTarget(holder.img) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                    circularBitmapDrawable.setCircular(true);
+                    holder.img.setImageDrawable(circularBitmapDrawable);
+                }
+            });
 
 
-        String id = operations.get(position).getId();
+            String id = reminders.get(position).getId_string();
 
-        if (selectedIds.contains(id)){
-            //if item is selected then,set foreground color of FrameLayout.
-            holder.rootView.setBackgroundResource(R.color.colorActionMode);
-        }
-        else {
-            //else remove selected item color.
-            holder.rootView.setBackgroundResource(android.R.color.transparent);
+            if (selectedIds.contains(id)) {
+                //if item is selected then,set foreground color of FrameLayout.
+                holder.rootView.setBackgroundResource(R.color.colorActionMode);
+            } else {
+                //else remove selected item color.
+                holder.rootView.setBackgroundResource(android.R.color.transparent);
+            }
         }
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return operations.size();
+        if (whichClass.equals("operations")){
+            return operations.size();
+        }
+        return reminders.size();
     }
 
 
     public Operation getItem(int position){
         return operations.get(position);
     }
-
+    public ReminderTemplate getReminderItem(int position){
+        return reminders.get(position);
+    }
     public void setSelectedIds(List<String> selectedIds) {
         this.selectedIds = selectedIds;
         notifyDataSetChanged();

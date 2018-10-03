@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -48,9 +50,32 @@
             android:name=".GetDetails"
             android:parentActivityName=".chooseDevice"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".showLog"
+        <activity
+            android:name=".showLog"
             android:parentActivityName=".chooseDevice"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ChooseNewOperations"
+            android:parentActivityName=".chooseDevice"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver
+            android:name=".Alarm"
+            android:process=":remote" />
+        <receiver android:name=".AutoStart">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".ShowReminder"
+            android:parentActivityName=".chooseDevice"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".ShowTemplateSetting"
+            android:parentActivityName=".chooseDevice"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

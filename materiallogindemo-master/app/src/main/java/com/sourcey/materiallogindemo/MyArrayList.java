@@ -60,6 +60,52 @@ public class MyArrayList<E> extends ArrayList<E> implements Serializable {
 
             return keep;
         }
+        if (whicClass.equals("operationsTemplate")) {
+            final File suspend_f = new File(cacheDir, whicClass);
+
+            FileOutputStream fos = null;
+            ObjectOutputStream oos = null;
+            boolean keep = true;
+
+            try {
+                fos = new FileOutputStream(suspend_f);
+                oos = new ObjectOutputStream(fos);
+                oos.writeObject(obj);
+            } catch (Exception e) {
+                keep = false;
+            } finally {
+                try {
+                    if (oos != null) oos.close();
+                    if (fos != null) fos.close();
+                    if (keep == false) suspend_f.delete();
+                } catch (Exception e) { /* do nothing */ }
+            }
+
+            return keep;
+        }
+        if (whicClass.equals("reminderTemplate")) {
+            final File suspend_f = new File(cacheDir, whicClass);
+
+            FileOutputStream fos = null;
+            ObjectOutputStream oos = null;
+            boolean keep = true;
+
+            try {
+                fos = new FileOutputStream(suspend_f);
+                oos = new ObjectOutputStream(fos);
+                oos.writeObject(obj);
+            } catch (Exception e) {
+                keep = false;
+            } finally {
+                try {
+                    if (oos != null) oos.close();
+                    if (fos != null) fos.close();
+                    if (keep == false) suspend_f.delete();
+                } catch (Exception e) { /* do nothing */ }
+            }
+
+            return keep;
+        }
         return false;
     }
 
@@ -97,6 +143,49 @@ public class MyArrayList<E> extends ArrayList<E> implements Serializable {
                 fis = new FileInputStream(suspend_f);
                 is = new ObjectInputStream(fis);
                 simpleClass = (MyArrayList<Device>) is.readObject();
+            } catch(Exception e) {
+                String val= e.getMessage();
+            } finally {
+                try {
+                    if (fis != null)   fis.close();
+                    if (is != null)   is.close();
+                } catch (Exception e) { }
+            }
+
+            return simpleClass;
+        }
+
+        if (whicClass.equals("operationsTemplate")){
+            final File suspend_f=new File(cacheDir, whicClass);
+            MyArrayList<TemplateOperation> simpleClass= null;
+            FileInputStream fis = null;
+            ObjectInputStream is = null;
+
+            try {
+                fis = new FileInputStream(suspend_f);
+                is = new ObjectInputStream(fis);
+                simpleClass = (MyArrayList<TemplateOperation>) is.readObject();
+            } catch(Exception e) {
+                String val= e.getMessage();
+            } finally {
+                try {
+                    if (fis != null)   fis.close();
+                    if (is != null)   is.close();
+                } catch (Exception e) { }
+            }
+
+            return simpleClass;
+        }
+        if (whicClass.equals("reminderTemplate")){
+            final File suspend_f=new File(cacheDir, whicClass);
+            MyArrayList<ReminderTemplate> simpleClass= null;
+            FileInputStream fis = null;
+            ObjectInputStream is = null;
+
+            try {
+                fis = new FileInputStream(suspend_f);
+                is = new ObjectInputStream(fis);
+                simpleClass = (MyArrayList<ReminderTemplate>) is.readObject();
             } catch(Exception e) {
                 String val= e.getMessage();
             } finally {

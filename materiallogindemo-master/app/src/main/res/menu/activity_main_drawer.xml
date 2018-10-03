@@ -13,6 +13,15 @@
             android:icon="@drawable/ic_history"
             android:title="عملیات های گذشته" />
         <item
+            android:id="@+id/nav_reminder"
+            android:icon="@drawable/ic_reminder"
+            android:title="مدیریت یادآوری ها" />
+
+        <item
+            android:id="@+id/nav_template"
+            android:icon="@drawable/ic_use_template"
+            android:title="مدیریت قالب ها" />
+        <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_setting"
             android:title="تنظیمات" />

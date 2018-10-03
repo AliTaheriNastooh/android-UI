@@ -1,5 +1,12 @@
 package com.sourcey.materiallogindemo;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -7,8 +14,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -17,38 +25,36 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.util.TypedValue;
+import android.text.InputType;
+import android.text.format.DateFormat;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 
 import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class Agriculture_system extends AppCompatActivity implements ActionMode.Callback{
 
@@ -57,13 +63,10 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     public static final String EXTRA_MESSAGE1 = "com.sourcey.materiallogindemo.MESSAGE";
     /////////////////////
     private Switch simpleSwitch;
-    private LinearLayout getNumberOfChannel;
     MyRecyclerViewAdapter adapter;
     ArrayList<String> nameArray=new ArrayList<String>();
     MyArrayList<Operation> operations=new MyArrayList<Operation>();
     public File cacheDir;
-    public  static int state=-1;
-    public static String numberOfChannel;
     CallingWithDevice callingWithDevice;
     private int RESULT_LOAD_IMAGE=73;
     private int RESULT_GET_DETAIL=75;
@@ -71,6 +74,21 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     private ActionMode actionMode;
     private boolean isMultiSelect = false;
     private List<String> selectedIds = new ArrayList<>();
+    private int whichRadioButton=-1;
+    private boolean radioButtonGroupFlag=false;
+    private CheckBox checkBoxEveryDay;
+    private CheckBox checkBoxEvery2Day;
+    private CheckBox checkBoxEveryWeek;
+    private CheckBox checkBoxEveryMonth;
+    private CheckBox checkBox;
+    private static Button hourOfWakeUp;
+    private TextView enterHour;
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+    private Alarm alarm=new Alarm();
+    static int minuteOfReminder;
+    static int houreOfReminder;
+    static  int idOfHourOfWakeUp;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,7 +158,7 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
        // setListViewHeightBasedOnChildren(listView);
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("  "+device.getName());
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.primary));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.black));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.primary));
 
         loadBackdrop();
@@ -151,87 +169,6 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
         simpleSwitch = (Switch) findViewById(R.id.simpleSwitch);
 
 
-        getNumberOfChannel=(LinearLayout)findViewById(R.id.layoutOfGetChannelNumber);
-        getNumberOfChannel.setVisibility(View.INVISIBLE);
-
-        NoDefaultSpinner spinner = (NoDefaultSpinner) findViewById(R.id.spinnerOfActivity);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.Activity_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter,"فرآیند را انتخاب کنید");
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-                switch(position){
-                    case 0:
-                        TextView textOfGetChannelNumber= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
-                        state=1;
-                        textOfGetChannelNumber.setText("شماره کانال مورد نظر برای روشن کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
-                        getNumberOfChannel.setVisibility(View.VISIBLE);
-                        break;
-                    case 1:
-                        TextView textOfGetChannelNumber1= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
-                        state=2;
-                        textOfGetChannelNumber1.setText("شماره کانال مورد نظر برای خاموش کردن را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
-                        getNumberOfChannel.setVisibility(View.VISIBLE);
-                        break;
-                    case 2:
-                        TextView textOfGetChannelNumber2= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
-                        state=3;
-                        textOfGetChannelNumber2.setText("شماره کانال مورد نظر برای دریافت گزارش را انتخاب کرده و دکمه مرحله بعد را بفشارید:");
-                        getNumberOfChannel.setVisibility(View.VISIBLE);
-                        break;
-                    case 3:
-                        state=4;
-                        getNumberOfChannel.setVisibility(View.INVISIBLE);
-//                        TextView textOfGetChannelNumber3= (TextView) findViewById(R.id.textViewOfGetChannelNumber);
-//                        NoDefaultSpinner spinner3 = (NoDefaultSpinner) findViewById(R.id.spinnerOfGetChannelNumber);
-//                        getNumberOfChannel.setVisibility(View.VISIBLE);
-//                        textOfGetChannelNumber3.setVisibility(View.INVISIBLE);
-//                        spinner3.setVisibility(View.INVISIBLE);
-//                        //Button button1=(Button)findViewById(R.id.buttonofCallDevice);
-                       // button1.setVisibility(View.VISIBLE);
-                        //setIntentToNextPage("configDevice");
-                        break;
-                    default:
-
-                }
-
-                Log.v("item........... :", (String) parent.getItemAtPosition(position)+"  switch : "+ simpleSwitch.isChecked());
-            }
-
-
-            public void onNothingSelected(AdapterView<?> parent) {
-                Log.v("item........... :", "nothing Selected");
-                // TODO Auto-generated method stub
-            }
-        });
-
-
-
-
-        NoDefaultSpinner spinner2 = (NoDefaultSpinner) findViewById(R.id.spinnerOfGetChannelNumber);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
-                R.array.channelNumber_array, android.R.layout.simple_spinner_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner2.setAdapter(adapter2,"کانال را انتخاب کنید:");
-        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                numberOfChannel=String.valueOf(position+1);
-            }
-
-
-            public void onNothingSelected(AdapterView<?> parent) {
-                numberOfChannel=String.valueOf(-1);
-            }
-        });
-
-
-
 
 
         FloatingActionButton fb_agriculture=(FloatingActionButton)findViewById(R.id.fb_agricultureSystem);
@@ -240,8 +177,38 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
             public void onClick(View view) {
                 Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
+
             }
         });
+
+
+        RadioGroup rGroup = (RadioGroup)findViewById(R.id.radioGroupOfTemplate);
+        rGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            public void onCheckedChanged(RadioGroup group, int checkedId)
+            {
+                String message="";
+                switch (checkedId){
+                    case R.id.radioButtonOfUseTemplate:
+
+                        message="useTemplate";
+                        whichRadioButton=R.id.radioButtonOfUseTemplate;
+                        break;
+                    case R.id.radioButtonOfNewOperation:
+                        message="chooseTemplateOperation";
+                        whichRadioButton=R.id.radioButtonOfNewOperation;
+                        break;
+
+                }
+                if(!radioButtonGroupFlag) {
+                    setIntentToNextPage(message, ChooseNewOperations.class);
+                }else{
+                    radioButtonGroupFlag=false;
+                }
+
+            }
+        });
+
     }
 
 
@@ -328,19 +295,45 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
             setResult(RESULT_OK,data1);
         }
         if (requestCode == RESULT_GET_DETAIL && resultCode == RESULT_OK && null != data) {
-
-            Operation tmp=(Operation) data.getSerializableExtra("operation");
-            nameArray.add(tmp.getTitle());
-            if (state!=4) {
-                tmp.setTitle(tmp.getTitle() + numberOfChannel);
+//            RadioGroup radioGroup1 = (RadioGroup)findViewById(R.id.radioGroupOfTemplate);
+//            radioGroup1.clearCheck();
+            if (data.getStringExtra("whichOperation").equals("template")){
+                Bundle bundle=data.getExtras();
+                ArrayList<Operation> tmpOperation1=(ArrayList<Operation>)bundle.getSerializable("operations");
+                for (int i=0;i<tmpOperation1.size();i++){
+                    nameArray.add(tmpOperation1.get(i).getTitle());
+                    tmpOperation1.get(i).setDeviceName(device.getName());
+                    tmpOperation1.get(i).setNewId();
+                }
+                operations.addAll(tmpOperation1);
+                adapter.notifyDataSetChanged();
+            }else{
+                if (data.getStringExtra("whichOperation").equals("newOperation")){
+                    Operation tmp=(Operation) data.getSerializableExtra("operation");
+                    nameArray.add(tmp.getTitle());
+                    if (data.getIntExtra("getState",0)!=4) {
+                        tmp.setTitle(tmp.getTitle() + data.getStringExtra("getChannelNumber"));
+                    }
+                    operations.add(tmp);
+                    adapter.notifyDataSetChanged();
+                }
             }
-            operations.add(tmp);
-            adapter.notifyDataSetChanged();
+            unCheckedRadioButton();
+//            RadioButton s=findViewById(whichRadioButton);
+//            s.setChecked(t);
+
         }
     }
 
 
+    public void unCheckedRadioButton(){
+//        RadioGroup radioGroup1 = (RadioGroup)findViewById(R.id.radioGroupOfTemplate);
+//        radioGroup1.clearCheck();
+        radioButtonGroupFlag=true;
+        RadioButton s=findViewById(whichRadioButton);
+        s.setChecked(false);
 
+    }
 
     //////////////////////////
 
@@ -389,11 +382,198 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 
     //////////////////////////
 
-    public void callButtonForNextState(View view){
-        goToNextPage("  ");
-    }
 
     /////////////////////////
+    public void buttonToSaveOperationAsTemplate(View view){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(Agriculture_system.this);
+        alertDialog.setMessage("نام الگو را وارد کنید");
+        final EditText input = new EditText(Agriculture_system.this);
+        hourOfWakeUp = new Button(getApplicationContext());
+        hourOfWakeUp.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                DialogFragment newFragment = new TimePickerFragment();
+                newFragment.show(getSupportFragmentManager(), "timePicker");
+
+            }
+        });
+        enterHour=new TextView(getApplicationContext());
+        enterHour.setText("ساعت یادآوری را وارد کنید:بین 1 تا 24");
+        hourOfWakeUp.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        hourOfWakeUp.setHint("ساعت را انتخاب کنید");
+        hourOfWakeUp.setTextColor(getResources().getColor(R.color.colorAccent));
+        hourOfWakeUp.setVisibility(View.INVISIBLE);
+        idOfHourOfWakeUp=22222;
+        hourOfWakeUp.setId(idOfHourOfWakeUp);
+        enterHour.setVisibility(View.INVISIBLE);
+        LinearLayout.LayoutParams params = new  LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin_left);
+        params.topMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin_top);
+        params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin_bottom);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin_left);
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        checkBox=new CheckBox(Agriculture_system.this);
+        checkBox.setText("یادآوری این الگو");
+        checkBox.setLayoutParams(params);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+               @Override
+               public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+                   if (checkBox.isChecked()){
+                       checkBoxEveryDay.setVisibility(View.VISIBLE);
+                       checkBoxEvery2Day.setVisibility(View.VISIBLE);
+                       checkBoxEveryWeek.setVisibility(View.VISIBLE);
+                       checkBoxEveryMonth.setVisibility(View.VISIBLE);
+                       hourOfWakeUp.setVisibility(View.VISIBLE);
+                       enterHour.setVisibility(View.VISIBLE);
+
+                   }else {
+                       checkBoxEveryDay.setVisibility(View.INVISIBLE);
+                       checkBoxEvery2Day.setVisibility(View.INVISIBLE);
+                       checkBoxEveryWeek.setVisibility(View.INVISIBLE);
+                       checkBoxEveryMonth.setVisibility(View.INVISIBLE);
+                        hourOfWakeUp.setVisibility(View.INVISIBLE);
+                        enterHour.setVisibility(View.INVISIBLE);
+                   }
+               }
+           }
+        );
+        int p=1;
+        checkBoxEveryDay=new CheckBox(Agriculture_system.this);
+        checkBoxEveryDay.setText("هر روز یادآوری کن");
+        checkBoxEveryDay.setLayoutParams(params);
+        checkBoxEveryDay.setVisibility(View.INVISIBLE);
+        checkBoxEveryDay.setOnClickListener(mListener);
+        checkBoxEveryDay.setId(p++);
+        checkBoxEvery2Day=new CheckBox(Agriculture_system.this);
+        checkBoxEvery2Day.setText("یک روز در میان یادآوری کن");
+        checkBoxEvery2Day.setLayoutParams(params);
+        checkBoxEvery2Day.setVisibility(View.INVISIBLE);
+        checkBoxEvery2Day.setOnClickListener(mListener);
+        checkBoxEvery2Day.setId(p++);
+        checkBoxEveryWeek=new CheckBox(Agriculture_system.this);
+        checkBoxEveryWeek.setText("هر هفته یادآوری کن");
+        checkBoxEveryWeek.setLayoutParams(params);
+        checkBoxEveryWeek.setOnClickListener(mListener);
+        checkBoxEveryWeek.setVisibility(View.INVISIBLE);
+        checkBoxEveryWeek.setId(p++);
+        checkBoxEveryMonth=new CheckBox(Agriculture_system.this);
+        checkBoxEveryMonth.setText("هر ماه یادآوری کن");
+        checkBoxEveryMonth.setLayoutParams(params);
+        checkBoxEveryMonth.setOnClickListener(mListener);
+        checkBoxEveryMonth.setVisibility(View.INVISIBLE);
+        checkBoxEveryMonth.setId(p++);
+        enterHour.setLayoutParams(params);
+        hourOfWakeUp.setLayoutParams(params);
+        layout.addView(input);
+        layout.addView(checkBox);
+        layout.addView(checkBoxEveryDay);
+        layout.addView(checkBoxEvery2Day);
+        layout.addView(checkBoxEveryWeek);
+        layout.addView(checkBoxEveryMonth);
+        layout.addView(enterHour);
+        layout.addView(hourOfWakeUp);
+        alertDialog.setView(layout);
+        alertDialog.setPositiveButton("تایید",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        /////////
+                        if(!input.getText().toString().isEmpty()){
+                            TemplateOperation tmpTemplate=saveOperationInTemplate(input.getText().toString());
+                            String tmpPeriod=getPeriodOfReminder();
+                            if (tmpPeriod.equals("error")){
+                                Toast.makeText(getApplicationContext(),"یادآوری و قالب ذخیره نشد . یکی از حالت های یادآوری(هر روز ، هر هفته ...) را انتخاب کنید و بعد تایید را بفشاری",Toast.LENGTH_LONG).show();
+                                dialog.cancel();
+                                return;
+                            }
+                            ReminderTemplate tmpReminder=new ReminderTemplate(device,tmpTemplate,tmpPeriod,houreOfReminder,minuteOfReminder,positionIntent);
+                            saveReminderTemplate(tmpReminder);
+                           // alarm.cancelAlarm(getApplicationContext());
+                            alarm.setAlarm(getApplicationContext(),tmpReminder);
+                            dialog.cancel();
+                        }
+                    }
+                });
+
+        alertDialog.setNegativeButton("انصراف",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+    }
+    public String getPeriodOfReminder(){
+        if(checkBoxEveryDay.isChecked()){
+            return  "everyDay";
+        }else{
+            if (checkBoxEvery2Day.isChecked()){
+                return  "every2Day";
+            }else{
+                if (checkBoxEveryWeek.isChecked()){
+                    return  "everyWeek";
+                }else{
+                    if (checkBoxEveryMonth.isChecked()){
+                        return  "everyMonth";
+                    }else {
+                        return "error";
+                    }
+                }
+            }
+        }
+    }
+
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            Agriculture_system.minuteOfReminder=minute;
+            Agriculture_system.houreOfReminder = hourOfDay;
+            hourOfWakeUp.setText(houreOfReminder+":"+minuteOfReminder);
+        }
+    }
+
+    private View.OnClickListener mListener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            final int checkedId = v.getId();
+            if (checkBoxEveryDay.getId() == checkedId) {
+                checkBoxEveryDay.setChecked(true);
+            } else {
+                checkBoxEveryDay.setChecked(false);
+            }
+
+            if (checkBoxEvery2Day.getId() == checkedId) {
+                checkBoxEvery2Day.setChecked(true);
+            } else {
+                checkBoxEvery2Day.setChecked(false);
+            }
+            if (checkBoxEveryMonth.getId() == checkedId) {
+                checkBoxEveryMonth.setChecked(true);
+            } else {
+                checkBoxEveryMonth.setChecked(false);
+            }
+            if (checkBoxEveryWeek.getId() == checkedId) {
+                checkBoxEveryWeek.setChecked(true);
+            } else {
+                checkBoxEveryWeek.setChecked(false);
+            }
+        }
+    };
     public void CallButtonForSetOperation(View view){
         simpleSwitch.setClickable(false);
         String setMessage="";
@@ -407,15 +587,17 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     public void getResultOfCalling(String recievedMassage){
         if(recievedMassage.equals("complete")||recievedMassage.equals("notcomplete") ){
             for (int i=0;i<operations.size();i++){
-
+                if(recievedMassage.equals("notcomplete")){
+                    operations.get(i).setNewId();
+                }
                 operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),recievedMassage,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
             }
             saveOperationInLog();
             if(recievedMassage.equals("notcomplete")){
-                setIntentToNextPage("showOperationWrong");
+                setIntentToNextPage("showOperationWrong",GetDetails.class);
             }
             if(recievedMassage.equals("complete")){
-                setIntentToNextPage("showOperationCorrect");
+                setIntentToNextPage("showOperationCorrect",GetDetails.class);
             }
         }else{
             Toast.makeText(getApplicationContext(),"wrong message",Toast.LENGTH_SHORT).show();
@@ -440,41 +622,20 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 
             saveOperationInLog();
             if(flag==false){
-                setIntentToNextPage("showOperationWrong");
+                setIntentToNextPage("showOperationWrong",GetDetails.class);
             }else{
-                setIntentToNextPage("showOperationCorrect");
+                setIntentToNextPage("showOperationCorrect",GetDetails.class);
             }
         }
     }
-    public void setIntentToNextPage(String sMessage){
-        Intent intent1 = new Intent(this, GetDetails.class);
+    public void setIntentToNextPage(String sMessage,Class destination){
+        Intent intent1 = new Intent(this,destination);
         String message = sMessage;
         intent1.putExtra(EXTRA_MESSAGE1+"1", message);
         intent1.putExtra(EXTRA_MESSAGE1+"2",device);
-        intent1.putExtra(EXTRA_MESSAGE1+"3", numberOfChannel);
         startActivityForResult(intent1,RESULT_GET_DETAIL);
     }
-    public void goToNextPage(String channelState){
-        switch (state){
-            case 1:
-                setIntentToNextPage("Channeloff");
-                break;
-            case 2:
-                setIntentToNextPage("Channelon");
 
-                break;
-
-            case 3:
-
-                break;
-
-            case 4:
-                setIntentToNextPage("configDevice");
-                break;
-
-            default:
-
-        }
 
 //        if(state==1){
 //            if(channelState.equals("0")){
@@ -493,7 +654,7 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
 //            }
 //        }
 
-    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -506,13 +667,14 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
     @Override
     public void onPause() {
         super.onPause();
+        boolean result =operations.saveObject(operations,cacheDir,"Operation"+device.getUniqueID());
         callingWithDevice.unRegesteredSMS();
     }
     @Override
     public void onStop() {
         super.onStop();
 
-        boolean result =operations.saveObject(operations,cacheDir,"Operation"+device.getUniqueID());
+
     }
 
     @Override
@@ -566,4 +728,49 @@ public class Agriculture_system extends AppCompatActivity implements ActionMode.
         }
         adapter.notifyDataSetChanged();
     }
+    public TemplateOperation saveOperationInTemplate(String name){
+        MyArrayList<Operation>tmp=new MyArrayList<Operation>();
+        tmp.addAll(operations);
+
+        TemplateOperation newTemplate=new TemplateOperation(name,tmp);
+        MyArrayList<TemplateOperation> templateOperations=new MyArrayList<TemplateOperation>();
+        MyArrayList<TemplateOperation> operationstmp = templateOperations.getObject(getApplicationContext(),cacheDir,"operationsTemplate");
+        if (operationstmp!=null){
+            //operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+            operationstmp.add(newTemplate);
+            operationstmp.saveObject(operationstmp,cacheDir,"operationsTemplate");
+        }else{
+//            for (int i=0;i<operations.size();i++){
+//                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+//            }
+            templateOperations.add(newTemplate);
+            templateOperations.saveObject(templateOperations,cacheDir,"operationsTemplate");
+        }
+        return newTemplate;
+    }
+    public void saveReminderTemplate(ReminderTemplate newReminderTemplate){
+
+        MyArrayList<ReminderTemplate> reminderTemplates=new MyArrayList<ReminderTemplate>();
+        MyArrayList<ReminderTemplate> remindertmp = reminderTemplates.getObject(getApplicationContext(),cacheDir,"reminderTemplate");
+        if (remindertmp!=null){
+            //operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+            remindertmp.add(newReminderTemplate);
+            remindertmp.saveObject(remindertmp,cacheDir,"reminderTemplate");
+        }else{
+//            for (int i=0;i<operations.size();i++){
+//                operations.get(i).setDetails(operations.get(i).getTitle(),operations.get(i).getInfo(),operationStatus,operations.get(i).getTime(),operations.get(i).getDate(),operations.get(i).getTextForCallDevice());
+//            }
+            reminderTemplates.add(newReminderTemplate);
+            reminderTemplates.saveObject(reminderTemplates,cacheDir,"reminderTemplate");
+        }
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////1
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////
 }

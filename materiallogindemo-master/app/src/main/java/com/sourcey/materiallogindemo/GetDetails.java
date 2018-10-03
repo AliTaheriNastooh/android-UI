@@ -29,7 +29,6 @@ public class GetDetails extends AppCompatActivity {
     Fragment fragment;
     private Device device;
     private Switch simpleSwitch;
-    private StartDTMF_Decode dtmf_decode;
     private String sentMassage;
     String numberOfChannel;
     @Override
@@ -55,7 +54,6 @@ public class GetDetails extends AppCompatActivity {
         TextView deviceAddress=(TextView)findViewById(R.id.deviceAdressInGetDetails);
         deviceAddress.setText( "آدرس دستگاه: " +device.getAddress());
         changeFragment(newFragment);
-        dtmf_decode=new StartDTMF_Decode(this);
        // callingWithDevice=new CallingWithDevice(this,"getDetails",device.getPhoneNumber());
     }
     ////////////////////
@@ -211,7 +209,7 @@ public class GetDetails extends AppCompatActivity {
                 return;
             }else {
 
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(), ("1#" + numberOfChannel + "#" +getedString)  );
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(), ("1#" + numberOfChannel + "#" +getedString),device.getName()  );
             }
         }
         if (newFragment.equals("Channelon")) {
@@ -221,7 +219,7 @@ public class GetDetails extends AppCompatActivity {
             if (getedString.equals("error")) {
                 return;
             }else {
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),("1#" + numberOfChannel + "#" +getedString) );
+                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),("1#" + numberOfChannel + "#" +getedString),device.getName() );
             }
 
         }
@@ -245,7 +243,7 @@ public class GetDetails extends AppCompatActivity {
             if (getedString.equals("error")) {
                 return;
             } else {
-                returnOperation=new Operation(stringForOperation[0],stringForOperation[1],"pending",getTime(),getDate(),("3#" +getedString) );
+                returnOperation=new Operation(stringForOperation[0] ,stringForOperation[1],"pending",getTime(),getDate(),("3#" +getedString),device.getName() );
 
             }
 
